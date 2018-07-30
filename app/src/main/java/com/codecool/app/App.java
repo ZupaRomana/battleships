@@ -16,7 +16,7 @@ public class App {
             e.printStackTrace();
         }
 
-//        httpServer.createContext("/index", new LoginPage());
+        httpServer.createContext("/index", new LoginPage());
         httpServer.createContext("/static", new Static());
 //        httpServer.createContext("/", new AccountController());
 
