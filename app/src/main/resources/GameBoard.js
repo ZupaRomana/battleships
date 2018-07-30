@@ -9,8 +9,8 @@ export class GameBoard {
     }
 
     loadSquares() {
-        for (let xPos = 0; xPos < 10; xPos++) {
-            for (let yPos = 0; yPos < 10; yPos++) {
+        for (let yPos = 0; yPos < 10; yPos++) {
+            for (let xPos = 0; xPos < 10; xPos++) {
                 this.gameBoard.add(new Square(xPos, yPos));
             }
         }
