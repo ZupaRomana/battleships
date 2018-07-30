@@ -24,4 +24,31 @@ export class GameBoard {
         }
         return gameBoard;
     }
+
+    changeContainerSize(gameBoardsContainer, squareContainer, browserZoomLevel) {
+        if (browserZoomLevel > 100) {  
+            squareContainer.style.width = `${gameBoardsContainer.offsetWidth * 0.4}px`;
+            squareContainer.style.height = `${gameBoardsContainer.offsetHeight * 0.6}px`;
+        } else {
+            squareContainer.style.width = `${40}%`;
+            squareContainer.style.height = `${60}%`;
+        }
+    }
+
+    static setSizeOfGameBoards(gameBoards) {
+        let browserZoomLevel = Math.round(window.devicePixelRatio * 100);
+        let gameBoardsContainer = document.getElementsByClassName("game-boards-container")[0];
+        let squareContainers = document.getElementsByClassName("game-board");
+    
+        for (let i = 0; i < gameBoards.length; i++) {
+            let squareContainer = squareContainers[i];
+            let gameBoard = gameBoards[i];
+            gameBoard.changeContainerSize(gameBoardsContainer, squareContainer, browserZoomLevel);
+            for (let square of gameBoard.gameBoard) {
+                square.changeSizeOfSquare(squareContainer.offsetWidth, squareContainer.offsetHeight, browserZoomLevel);
+            }
+        }
+    }
+
+
 }
