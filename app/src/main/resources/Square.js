@@ -10,7 +10,9 @@ export class Square {
     loadDiv() {
         this.div = document.createElement("div");
         this.div.setAttribute("class", "square");
-        this.div.textContent = `x: ${this.xPos} y: ${this.yPos}`;
+        this.div.addEventListener("click", () => {
+            alert(`x: ${this.xPos} y: ${this.yPos}`);
+        });
     }
 
     getHTMLSquare() {
