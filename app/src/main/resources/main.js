@@ -27,7 +27,7 @@ function scaleGameBoardToBrowserZoomLevel() {
         container.style.width = `${100}%`;
         container.style.height = `${100}%`;
     }
-    GameBoard.setSizeOfGameBoard(gameBoards);
+    GameBoard.setSizeOfGameBoards(gameBoards);
     });
 }
 
