@@ -1,6 +1,8 @@
 "use strict";
 
-let gameBoard = document.createElement("div");
-gameBoard.setAttribute("class", "game-board");
-gameBoard.textContent = "Battleships";
-document.body.appendChild(gameBoard);
+import { GameBoard } from "./GameBoard.js";
+let container = document.createElement("div");
+container.setAttribute("class", "game-boards-container");
+container.appendChild(new GameBoard().getGameBoard());
+container.appendChild(new GameBoard().getGameBoard());
+document.body.appendChild(container);
