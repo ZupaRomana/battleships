@@ -17,6 +17,11 @@ export class GameBoard {
     }
 
     getGameBoard() {
-        return this.gameBoard;
+        let gameBoard = document.createElement("div");
+        gameBoard.setAttribute("class", "game-board");
+        for (let square of this.gameBoard) {
+            gameBoard.appendChild(square.getHTMLSquare());
+        }
+        return gameBoard;
     }
 }
