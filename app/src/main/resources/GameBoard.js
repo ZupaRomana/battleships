@@ -72,7 +72,7 @@ export class GameBoard {
                 htmlSquare.style.border = "1px solid red";
                 htmlSquare.style.backgroundColor = "#660000";
                 square.isHit = true;
-                this.changeCornersSquaresToMiss(square, htmlSquare);
+                this.changeCornerSquaresToMiss(square, htmlSquare);
             } else {
                 htmlSquare.style.backgroundColor = "white";
                 square.isMiss = true;
@@ -84,7 +84,7 @@ export class GameBoard {
         htmlSquare.addEventListener("click", onClick );
     }
 
-    changeCornersSquaresToMiss(square) {
+    changeCornerSquaresToMiss(square) {
         let xPos = square.xPos;
         let yPos = square.yPos;
         for (let i = 0; i < this.gameBoard.length; i++) {
@@ -101,7 +101,6 @@ export class GameBoard {
         let leftXPos = cornerSquare.xPos + 1;
         let topYPos = cornerSquare.yPos - 1;
         let bottomYPos = cornerSquare.yPos + 1;
-        console.log(rightXPos === xPos | leftXPos === xPos) & (topYPos === yPos | bottomYPos === yPos);
         return (rightXPos === xPos | leftXPos === xPos) & (topYPos === yPos | bottomYPos === yPos);
     }
 
