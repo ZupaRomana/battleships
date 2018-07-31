@@ -14,13 +14,13 @@ export class GameBoardUpdater {
 
     updatePlayerMap(json, actualGameBoards) {
         let receivedGameBoards = this.parseJSONToObject(json).gameBoards;
-        let actualGameBoard = getActualPlayerGameBoard(actualGameBoards);
-        let receivedGameBoard = getReceivedPlayerGameBoard(receivedGameBoards);
+        let actualGameBoard = this.getActualPlayerGameBoard(actualGameBoards);
+        let receivedGameBoard = this.getReceivedPlayerGameBoard(receivedGameBoards);
 
         for (let i = 0; i < actualGameBoard.gameBoard.length; i++) {
             let actualSquare = actualGameBoard.gameBoard[i];
             let receivedSquare = receivedGameBoard.gameBoard[i];
-            
+
             if (receivedSquare.xPos === actualSquare.xPos & receivedSquare.yPos === actualSquare.yPos) {
                 this.checkAndChangeSquareState(receivedSquare, actualSquare);
                 actualSquare.updateDivColor();
