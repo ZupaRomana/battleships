@@ -1,20 +1,13 @@
 "use strict";
 
 export class Square {
-    constructor(xPos, yPos) {
-        this.xPos = xPos;
-        this.yPos = yPos;
+    constructor() {
         this.loadDiv();
     }
 
     loadDiv() {
         this.div = document.createElement("div");
         this.div.setAttribute("class", "square");
-        this.div.addEventListener("click", () => {
-            alert(`x: ${this.xPos} y: ${this.yPos}`);
-            this.div.style.backgroundColor = "#ff3333"
-            console.log(`Width: ${this.div.offsetWidth} Height: ${this.div.offsetHeight}`);
-        });
     }
 
     getHTMLSquare() {
