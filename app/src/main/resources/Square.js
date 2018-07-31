@@ -14,7 +14,6 @@ export class Square {
         return this.div;
     }
 
-
     hasSquareOnCorner(square) {
         let rightXPos = square.xPos - 1;
         let leftXPos = square.xPos + 1;
@@ -34,6 +33,14 @@ export class Square {
             this.div.style.margin = `${1 / multipler}px`;
         } else {
             this.div.style.margin = `${1}px`;
+        }
+    }
+
+    updateDivColor() {
+        if (this.isShip & this.isHit) {
+            this.div.style.backgroundColor = "red";
+        } else if (this.isMiss) {
+            this.div.style.backgroundColor = "white";
         }
     }
 }
