@@ -8,7 +8,11 @@ export class GameBoardUpdater {
         return JSON.stringify(gameBoardContainer);
     }
 
-    parseJSONToGameObject(json) { 
+    parseJSONToObject(json) { 
         return JSON.parse(json);
+    }
+
+    updatePlayerMap(json) {
+        let receivedGameBoardContainer = this.parseJSONToObject(json);
     }
 }
