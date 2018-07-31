@@ -41,66 +41,68 @@ export class GameBoard {
 
     getPlayerGameBoard() {
         let gameBoard = this.getGameBoardDiv();
-        let playerSquares = gameBoard.childNodes;
-        for (let i = 0; i < playerSquares.length; i++) {
-            let htmlSquare = playerSquares[i];
+    
+        for (let i = 0; i < this.gameBoard.length; i++) {
             let square = this.gameBoard[i];
-
             if (square.isShip) {
-                htmlSquare.style.backgroundColor = "black";
-            } else if (square.isMiss) {
-                htmlSquare.style.backgroundColor = "white";
+                square.div.style.backgroundColor = "black";
             }
-        } 
+        }
+        gameBoard.style.border = "2px solid black"; 
         return gameBoard;
     }
 
     getEnemyGameBoard() {
         let gameBoard = this.getGameBoardDiv();
-        let enemySquares = gameBoard.childNodes;
-        for (let i = 0; i < enemySquares.length; i++) {
+        
+        for (let i = 0; i < this.gameBoard.length; i++) {
             let square = this.gameBoard[i];
             if (i % 2 === 0) {
                 square.isShip = true;
-            }
-            let htmlSquare = enemySquares[i]; 
-            this.setEnemyGameBoardColorAddEvent(square, htmlSquare);
-            
+            } 
+            this.setEnemyGameBoardColorAddEvent(square);
         }
+        gameBoard.style.border = "2px solid black";
         return gameBoard;
     }
 
-    setEnemyGameBoardColorAddEvent(square, htmlSquare) {
+    setEnemyGameBoardColorAddEvent(square) {
+        let htmlSquare = square.div;
         htmlSquare.style.backgroundColor = "cyan";
-        let onClick = () => {
-            
+        let onClick = (e) => {
             console.log(`Width: ${htmlSquare.offsetWidth} Height: ${htmlSquare.offsetHeight}`);
             console.log(`xPos: ${square.xPos} yPos: ${square.yPos}`);
 
             if (square.isShip) {
-                htmlSquare.style.border = "1px solid red";
-                htmlSquare.style.backgroundColor = "#660000";
-                square.isHit = true;
+                this.changeSquareToHit(square);
                 this.changeCornerSquaresToMiss(square);
             } else {
-                htmlSquare.style.backgroundColor = "white";
-                square.isMiss = true;
+                this.changeSquareToMiss(square);
             }
             if (square.isHit | square.isMiss) {
                 htmlSquare.removeEventListener("click", onClick);
             }
         };
-        htmlSquare.addEventListener("click", onClick );
+        htmlSquare.addEventListener("click", onClick);
     }
 
     changeCornerSquaresToMiss(square) {
         for (let i = 0; i < this.gameBoard.length; i++) {
             let cornerSquare = this.gameBoard[i];
             if (square.hasSquareOnCorner(cornerSquare) & !cornerSquare.isShip) {
-                cornerSquare.div.style.backgroundColor = "white";
-                cornerSquare.isMiss = true;
+                this.changeSquareToMiss(cornerSquare);
             }
         }
+    }
+
+    changeSquareToMiss(square) {
+        square.isMiss = true;
+        square.updateDivColor();
+    }
+
+    changeSquareToHit(square) {
+        square.isHit = true;
+        square.updateDivColor();
     }
 
     changeContainerSize(gameBoardsContainer, squareContainer, browserZoomLevel) {
