@@ -12,7 +12,45 @@ export class GameBoardUpdater {
         return JSON.parse(json);
     }
 
-    updatePlayerMap(json) {
-        let receivedGameBoardContainer = this.parseJSONToObject(json);
+    updatePlayerMap(json, actualGameBoards) {
+        let receivedGameBoards = this.parseJSONToObject(json).gameBoards;
+        let actualGameBoard = getActualPlayerGameBoard(actualGameBoards);
+        let receivedGameBoard = getReceivedPlayerGameBoard(receivedGameBoards);
+
+        for (let i = 0; i < actualGameBoard.gameBoard.length; i++) {
+            let actualSquare = actualGameBoard.gameBoard[i];
+            let receivedSquare = receivedGameBoard.gameBoard[i];
+            
+            if (receivedSquare.xPos === actualSquare.xPos & receivedSquare.yPos === actualSquare.yPos) {
+                this.checkAndChangeSquareState(receivedSquare, actualSquare);
+                actualSquare.updateDivColor();
+            }
+        }
+    }
+    
+    getActualPlayerGameBoard(actualGameBoards) {
+        for (let gameBoard of actualGameBoards) {
+            if (gameBoard.isPlayer) {
+                return gameBoard;
+            }
+        }
+    }
+
+    getReceivedPlayerGameBoard(receivedGameBoards) {
+        for (let gameBoard of receivedGameBoards) {
+            if (!gameBoard.isPlayer) {
+                return gameBoard;
+            }
+        }
+    }
+
+    checkAndChangeSquareState(receivedSquare, actualSquare) {
+        if (receivedSquare.isHit !== actualSquare.isHit) {
+            actualSquare.isHit = receivedSquare.isHit;
+        } else if (receivedSquare.isMiss !== actualSquare.isMiss) {
+            actualSquare.isMiss = receivedSquare.isMiss;
+        } else if (receivedSquare.isShip !== actualSquare.isShip) {
+            actualSquare.isShip = receivedSquare.isShip;
+        }
     }
 }
