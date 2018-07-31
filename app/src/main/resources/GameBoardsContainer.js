@@ -12,13 +12,6 @@ export class GameBoardsContainer {
         this.container = document.createElement("div");
         this.container.setAttribute("class", "game-boards-container");
         this.fillContaier();
-        this.container.addEventListener("click", () => {
-            let squareContainers = document.getElementsByClassName("game-board");
-            console.log(`Container -> Width: ${this.container.offsetWidth} Height: ${this.container.offsetHeight}`);
-            for (let squareContainer of squareContainers) {
-                console.log(`GameBoard -> Width: ${squareContainer.offsetWidth} Height: ${squareContainer.offsetHeight}`);
-            }
-        })
     }
 
     fillContaier() {
