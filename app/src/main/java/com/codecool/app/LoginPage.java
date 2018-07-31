@@ -36,7 +36,7 @@ public class LoginPage implements HttpHandler {
 
         switch (data){
             case "index":
-                buildResponse("src/main/resources/index.html");
+                buildResponse("src/main/resources/static/html/index.html");
                 break;
             case "clicked":
                 buildResponse();
