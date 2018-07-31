@@ -4,7 +4,7 @@ import { GameBoard } from "./GameBoard.js";
 
 export class GameBoardsContainer {
     constructor() {
-        this.gameBoards = [new GameBoard(), new GameBoard()];
+        this.gameBoards = [new GameBoard(false), new GameBoard()];
         this.loadAndFillContainer();
     }
 
@@ -15,8 +15,9 @@ export class GameBoardsContainer {
     }
 
     fillContaier() {
-        this.container.appendChild(this.gameBoards[0].getEnemyGameBoard());
-        this.container.appendChild(this.gameBoards[1].getPlayerGameBoard());
+        for (let gameBoard of this.gameBoards) {
+            this.container.appendChild(gameBoard.getGameBoard());
+        }
     }
 
     scaleGameBoardToBrowserZoomLevel() {
