@@ -3,6 +3,6 @@
 import { GameBoardsContainer } from "./GameBoardsContainer.js";
 
 let gameBoardsContainer = new GameBoardsContainer();
-document.body.appendChild(gameBoardsContainer.container);
+document.getElementById("main-container").appendChild(gameBoardsContainer.container);
 
 gameBoardsContainer.scaleGameBoardToBrowserZoomLevel();
