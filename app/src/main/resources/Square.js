@@ -14,6 +14,16 @@ export class Square {
         return this.div;
     }
 
+
+    hasSquareOnCorner(square) {
+        let rightXPos = square.xPos - 1;
+        let leftXPos = square.xPos + 1;
+        let topYPos = square.yPos - 1;
+        let bottomYPos = square.yPos + 1;
+        return (rightXPos === this.xPos | leftXPos === this.xPos) &
+                 (topYPos === this.yPos | bottomYPos === this.yPos);
+    }
+
     changeSizeOfSquare(boardWidth, boardHeight, browserZoomLevel) {
         let multipler = browserZoomLevel / 100;
         this.div.style.width = `${boardWidth * 0.09}px`;
