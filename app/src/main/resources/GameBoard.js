@@ -3,8 +3,9 @@
 import { Square } from "./Square.js";
 
 export class GameBoard {
-    constructor() {
+    constructor(isPlayer = true) {
         this.gameBoard = [];
+        this.isPlayer = isPlayer;
         this.loadSquares();
     }
 
@@ -19,8 +20,16 @@ export class GameBoard {
         }
     }
 
-
     getGameBoard() {
+        if (this.isPlayer) {
+            return this.getPlayerGameBoard();
+        } else {
+            return this.getEnemyGameBoard();
+        }
+    }
+
+
+    getGameBoardDiv() {
         let gameBoard = document.createElement("div");
         gameBoard.setAttribute("class", "game-board");
         for (let square of this.gameBoard) {
@@ -31,7 +40,7 @@ export class GameBoard {
     }
 
     getPlayerGameBoard() {
-        let gameBoard = this.getGameBoard();
+        let gameBoard = this.getGameBoardDiv();
         let playerSquares = gameBoard.childNodes;
         for (let i = 0; i < playerSquares.length; i++) {
             let htmlSquare = playerSquares[i];
@@ -47,7 +56,7 @@ export class GameBoard {
     }
 
     getEnemyGameBoard() {
-        let gameBoard = this.getGameBoard();
+        let gameBoard = this.getGameBoardDiv();
         let enemySquares = gameBoard.childNodes;
         for (let i = 0; i < enemySquares.length; i++) {
             let square = this.gameBoard[i];
