@@ -22,9 +22,8 @@ export class GameBoardsContainer {
     }
 
     fillContaier() {
-        for (let gameBoard of this.gameBoards) {
-            this.container.appendChild(gameBoard.getGameBoard());
-        }
+        this.container.appendChild(this.gameBoards[0].getEnemyGameBoard());
+        this.container.appendChild(this.gameBoards[1].getPlayerGameBoard());
     }
 
     scaleGameBoardToBrowserZoomLevel() {
