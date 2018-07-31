@@ -13,6 +13,7 @@ export class Square {
         this.div.addEventListener("click", () => {
             alert(`x: ${this.xPos} y: ${this.yPos}`);
         });
+        this.div.setAttribute("droppable", true);
     }
 
     getHTMLSquare() {
