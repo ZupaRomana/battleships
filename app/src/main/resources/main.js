@@ -1,8 +1,8 @@
 "use strict";
 
-import { GameBoard } from "./GameBoard.js";
-let container = document.createElement("div");
-container.setAttribute("class", "game-boards-container");
-container.appendChild(new GameBoard().getGameBoard());
-container.appendChild(new GameBoard().getGameBoard());
-document.body.appendChild(container);
+import { GameBoardsContainer } from "./GameBoardsContainer.js";
+
+let gameBoardsContainer = new GameBoardsContainer();
+document.getElementById("main-container").appendChild(gameBoardsContainer.container);
+
+gameBoardsContainer.scaleGameBoardToBrowserZoomLevel();
