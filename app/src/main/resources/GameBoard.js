@@ -19,6 +19,17 @@ export class GameBoard {
         }
     }
 
+
+    getGameBoard() {
+        let gameBoard = document.createElement("div");
+        gameBoard.setAttribute("class", "game-board");
+        for (let square of this.gameBoard) {
+            let htmlSquare = square.getHTMLSquare();
+            gameBoard.appendChild(htmlSquare);
+        }
+        return gameBoard;
+    }
+
     getPlayerGameBoard() {
         let gameBoard = this.getGameBoard();
         let playerSquares = gameBoard.childNodes;
@@ -52,12 +63,16 @@ export class GameBoard {
 
     setEnemyGameBoardColorAddEvent(square, htmlSquare) {
         htmlSquare.style.backgroundColor = "cyan";
-
         let onClick = () => {
+            
+            console.log(`Width: ${htmlSquare.offsetWidth} Height: ${htmlSquare.offsetHeight}`);
+            console.log(`xPos: ${square.xPos} yPos: ${square.yPos}`);
+
             if (square.isShip) {
                 htmlSquare.style.border = "1px solid red";
                 htmlSquare.style.backgroundColor = "#660000";
                 square.isHit = true;
+                this.changeCornersSquaresToMiss(square, htmlSquare);
             } else {
                 htmlSquare.style.backgroundColor = "white";
                 square.isMiss = true;
@@ -65,20 +80,29 @@ export class GameBoard {
             if (square.isHit | square.isMiss) {
                 htmlSquare.removeEventListener("click", onClick);
             }
-            console.log(`Width: ${htmlSquare.offsetWidth} Height: ${htmlSquare.offsetHeight}`);
         };
-
         htmlSquare.addEventListener("click", onClick );
     }
 
-    getGameBoard() {
-        let gameBoard = document.createElement("div");
-        gameBoard.setAttribute("class", "game-board");
-        for (let square of this.gameBoard) {
-            let htmlSquare = square.getHTMLSquare();
-            gameBoard.appendChild(htmlSquare);
+    changeCornersSquaresToMiss(square) {
+        let xPos = square.xPos;
+        let yPos = square.yPos;
+        for (let i = 0; i < this.gameBoard.length; i++) {
+            let cornerSquare = this.gameBoard[i];
+            if (this.squareIsCorner(xPos, yPos, cornerSquare)) {
+                cornerSquare.div.style.backgroundColor = "white";
+                cornerSquare.isMiss = true;
+            }
         }
-        return gameBoard;
+    }
+
+    squareIsCorner(xPos, yPos, cornerSquare) {
+        let rightXPos = cornerSquare.xPos - 1;
+        let leftXPos = cornerSquare.xPos + 1;
+        let topYPos = cornerSquare.yPos - 1;
+        let bottomYPos = cornerSquare.yPos + 1;
+        console.log(rightXPos === xPos | leftXPos === xPos) & (topYPos === yPos | bottomYPos === yPos);
+        return (rightXPos === xPos | leftXPos === xPos) & (topYPos === yPos | bottomYPos === yPos);
     }
 
     changeContainerSize(gameBoardsContainer, squareContainer, browserZoomLevel) {
