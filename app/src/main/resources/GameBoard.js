@@ -20,15 +20,29 @@ export class GameBoard {
     }
 
     getPlayerGameBoard() {
-        return this.getGameBoard();
+        let gameBoard = this.getGameBoard();
+        let playerSquares = gameBoard.childNodes;
+        for (let i = 0; i < playerSquares.length; i++) {
+            let htmlSquare = playerSquares[i];
+            let square = this.gameBoard[i];
+
+            if (square.isShip) {
+                htmlSquare.style.backgroundColor = "black";
+            } else if (square.isMiss) {
+                htmlSquare.style.backgroundColor = "white";
+            }
+        } 
+        return gameBoard;
     }
 
     getEnemyGameBoard() {
         let gameBoard = this.getGameBoard();
         let enemySquares = gameBoard.childNodes;
-        for (let i = 0; i < enemySquares.length; i++) {//square of enemySquares) {
+        for (let i = 0; i < enemySquares.length; i++) {
             let square = this.gameBoard[i];
-            console.log(square);
+            if (i % 2 === 0) {
+                square.isShip = true;
+            }
             let htmlSquare = enemySquares[i]; 
             this.setEnemyGameBoardColorAddEvent(square, htmlSquare);
             
@@ -38,11 +52,23 @@ export class GameBoard {
 
     setEnemyGameBoardColorAddEvent(square, htmlSquare) {
         htmlSquare.style.backgroundColor = "cyan";
-        htmlSquare.addEventListener("click", () => {
-            alert(`x: ${square.xPos} y: ${square.yPos}`);
-            htmlSquare.style.backgroundColor = "#ff3333";
+
+        let onClick = () => {
+            if (square.isShip) {
+                htmlSquare.style.border = "1px solid red";
+                htmlSquare.style.backgroundColor = "#660000";
+                square.isHit = true;
+            } else {
+                htmlSquare.style.backgroundColor = "white";
+                square.isMiss = true;
+            }
+            if (square.isHit | square.isMiss) {
+                htmlSquare.removeEventListener("click", onClick);
+            }
             console.log(`Width: ${htmlSquare.offsetWidth} Height: ${htmlSquare.offsetHeight}`);
-        });
+        };
+
+        htmlSquare.addEventListener("click", onClick );
     }
 
     getGameBoard() {
