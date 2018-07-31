@@ -94,8 +94,6 @@ export class GameBoard {
     }
 
     changeCornerSquaresToMiss(square) {
-        let xPos = square.xPos;
-        let yPos = square.yPos;
         for (let i = 0; i < this.gameBoard.length; i++) {
             let cornerSquare = this.gameBoard[i];
             if (square.hasSquareOnCorner(cornerSquare) & !cornerSquare.isShip) {
