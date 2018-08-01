@@ -17,6 +17,7 @@ export class GameBoardsContainer {
         this.container.addEventListener("click", () => {
             let json = this.gameBoardUpdater.parseGameBoardContainerToJSON(this);
             this.gameBoardUpdater.updatePlayerMap(json, this.gameBoards);
+            this.gameBoardUpdater.getJSONFromServer();
         });
     }
 
