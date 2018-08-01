@@ -2,17 +2,26 @@
 
 export class Square {
     constructor() {
-        this.loadDiv();
+        this.updateDivColor = function() {
+            if (this.isShip & this.isHit) {
+                this.div.style.backgroundColor = "red";
+            } else if (this.isMiss) {
+                this.div.style.backgroundColor = "white";
+            } else if (this.isShip) {
+                this.div.style.backgroundColor = "black";
+            }
+        }
+        this.getHTMLSquare = function() {
+            return this.div;
+        }
     }
 
     loadDiv() {
         this.div = document.createElement("div");
         this.div.setAttribute("class", "square");
         this.div.setAttribute("droppable", true);
-    }
-
-    getHTMLSquare() {
-        return this.div;
+        this.div.setAttribute("xpos", this.xPos);
+        this.div.setAttribute("ypos", this.yPos);
     }
 
     hasSquareOnCorner(square) {
@@ -37,11 +46,4 @@ export class Square {
         }
     }
 
-    updateDivColor() {
-        if (this.isShip & this.isHit) {
-            this.div.style.backgroundColor = "red";
-        } else if (this.isMiss) {
-            this.div.style.backgroundColor = "white";
-        }
-    }
 }
