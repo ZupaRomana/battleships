@@ -9,10 +9,11 @@ function showTactics() {
     let resetButton = document.createElement("button");
     resetButton.setAttribute("id", "resetButton");
     resetButton.textContent = "RESET";
-    mainContainer.appendChild(resetButton);
 
     let gameboard = new GameBoard();
     let map = gameboard.getPlayerGameBoard();
+    mainContainer.appendChild(resetButton);
+
     mainContainer.appendChild(map);
     resetButton.addEventListener("click", function () {
         let newGameBoard = resetMap(gameboard, mainContainer);
@@ -35,9 +36,14 @@ function resetMap(gameboard, mainContainer) {
 }
 
 function createShipsContainer(mainContainer) {
+    let container = document.createElement("div");
+    container.setAttribute("id", "myContainer");
     let shipsContainer = document.createElement("div");
     shipsContainer.setAttribute("id", "shipsContainer");
-    shipsContainer.textContent = "Your ships";
+    let title = document.createElement("div");
+    title.setAttribute("id", "header");
+    shipsContainer.appendChild(title);
+    title.textContent = "Your ships";
     mainContainer.appendChild(shipsContainer);
 }
 
