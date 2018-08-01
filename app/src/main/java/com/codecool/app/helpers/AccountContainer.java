@@ -6,7 +6,7 @@ import java.util.Map;
 public class AccountContainer {
 
     private static AccountContainer instance;
-    private Map<String, Integer> sessionIdNickname;
+    private Map<String, String> sessionIdNickname;
 
     private AccountContainer() {
         sessionIdNickname = new HashMap<>();
@@ -20,11 +20,11 @@ public class AccountContainer {
         return instance;
     }
 
-    public void add(String sessionId, int id) {
-        sessionIdNickname.put(sessionId, id);
+    public void add(String sessionId, String nickName) {
+        sessionIdNickname.put(sessionId, nickName);
     }
 
-    public int get(String sessionId) {
+    public String get(String sessionId) {
         return sessionIdNickname.get(sessionId);
     }
 
@@ -34,10 +34,12 @@ public class AccountContainer {
 
     public void remove(int sessionId) {
         for (String session : sessionIdNickname.keySet()) {
-            if (sessionIdNickname.get(session) == sessionId) {
+            if (sessionIdNickname.get(session).equals(sessionId)) {
                 sessionIdNickname.remove(session);
             }
         }
     }
+
+    public int getSize() { return sessionIdNickname.keySet().size();}
 
 }

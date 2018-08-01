@@ -1,15 +1,20 @@
 package com.codecool.app;
 
+import com.codecool.app.helpers.AccountContainer;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import jdk.nashorn.internal.parser.JSONParser;
 import org.json.JSONArray;
+import org.json.JSONString;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
+import java.net.HttpCookie;
 import java.net.URI;
+import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.UUID;
 
 public class LoginPage implements HttpHandler {
 
@@ -19,12 +24,20 @@ public class LoginPage implements HttpHandler {
     public void handle(HttpExchange httpExchange) throws IOException
     {
         String method = httpExchange.getRequestMethod();
+        AccountContainer accountContainer = AccountContainer.getInstance();
 
         if (method.equals("GET")) {
-            prepareResponse(httpExchange);
+            URI uri = httpExchange.getRequestURI();
+            if (uri.toString().contains("dupa")){ JSONArray jsonArray = new JSONArray();
+                jsonArray.put(accountContainer.getSize());
+                response = jsonArray.toString();
+                System.out.println(response + " RESPONSE");}
+            else {prepareResponse(httpExchange);}
 
         } else {
-            System.out.println("POST");
+            catchData(httpExchange);
+            System.out.println(accountContainer.getSize());
+            changeActualFunction();
         }
 
         this.sendResponse(httpExchange);
@@ -46,9 +59,11 @@ public class LoginPage implements HttpHandler {
 
     private void sendResponse(HttpExchange httpExchange) throws IOException
     {
+        System.out.println("SENDIN");
         httpExchange.sendResponseHeaders(200, response.length());
         OutputStream os = httpExchange.getResponseBody();
         os.write(response.getBytes());
+        System.out.println("SENDINEEEEEEEEEEEEEEEEe");
         os.close();
     }
 
@@ -75,5 +90,54 @@ public class LoginPage implements HttpHandler {
             stringBuilder.append(scanner.nextLine()).append("\n");
         }
         response = stringBuilder.toString();
+    }
+
+    private void catchData(HttpExchange httpExchange) throws IOException {
+
+        Map<String, String> keyValue = getInputs(httpExchange);
+        AccountContainer accountContainer = AccountContainer.getInstance();
+
+        String uuid = UUID.randomUUID().toString();
+        String nickName = keyValue.get("nickName");
+
+        System.out.println(nickName + " has entered the game!");
+
+        accountContainer.add(uuid, nickName);
+
+        HttpCookie httpCookie = new HttpCookie("sessionId", uuid);
+        httpExchange.getResponseHeaders().add("Set-Cookie", httpCookie.toString());
+    }
+
+    private static Map<String, String> parseFormData(String formData) throws UnsupportedEncodingException
+    {
+        Map<String, String> map = new HashMap<>();
+        formData = removeFuckingKurwa(formData);
+        String[] pairs = formData.split(":");
+        map.put(pairs[0], pairs[1]);
+        return map;
+    }
+
+    private static String removeFuckingKurwa(String toSplit)
+    {
+        toSplit = toSplit.replace("{", "");
+        toSplit = toSplit.replace("}", "");
+        toSplit = toSplit.replace("\"", "");
+        toSplit = toSplit.replace("\\", "");
+        return toSplit;
+    }
+
+    private Map<String, String> getInputs(HttpExchange httpExchange) throws IOException
+    {
+        InputStreamReader isr = new InputStreamReader(httpExchange.getRequestBody(), "utf-8");
+        BufferedReader br = new BufferedReader(isr);
+        String formData = br.readLine();
+        return parseFormData(formData);
+    }
+
+    private void changeActualFunction()
+    {
+        JSONArray jsonArray = new JSONArray();
+        jsonArray.put("a");
+        response = jsonArray.toString();
     }
 }
