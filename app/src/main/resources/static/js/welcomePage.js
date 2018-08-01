@@ -1,70 +1,82 @@
 "use strict";
 
-let mainDiv = document.querySelector('#main-container');
+//import { gameBoard } from "./main.js";
 
-let contentDiv = document.createElement('div');
-contentDiv.setAttribute('id', 'content-container');
+export class Welcome {
+    constructor(){};
+    run() {
 
-let header = document.createElement('header');
-header.innerHTML = 'Battleships v1.1';
+    let mainDiv = document.querySelector('#main-container');
 
-let form = document.createElement('form');
-form.setAttribute('id', 'submits-container');
-form.addEventListener(`submit`, () => sendPost(document.querySelector('#nick-name').value));
+    let contentDiv = document.createElement('div');
+    contentDiv.setAttribute('id', 'content-container');
 
-let input = document.createElement('input');
-input.setAttribute('id', 'nick-name')
-input.setAttribute('type', 'text');
-input.setAttribute('placeholder', 'Enter your name');
-input.setAttribute('required', '');
+    let header = document.createElement('header');
+    header.innerHTML = 'Battleships v1.1';
 
-let br = document.createElement('br');
+    let form = document.createElement('form');
+    form.setAttribute('id', 'submits-container');
+    form.addEventListener(`submit`, () => sendPost(document.querySelector('#nick-name').value));
 
-let inputSubmit = document.createElement('input');
-inputSubmit.setAttribute('type', 'submit');
-inputSubmit.setAttribute('value', 'Start');
+    let input = document.createElement('input');
+    input.setAttribute('id', 'nick-name')
+    input.setAttribute('type', 'text');
+    input.setAttribute('placeholder', 'Enter your name');
+    input.setAttribute('required', '');
 
-mainDiv.appendChild(contentDiv);
+    let br = document.createElement('br');
 
-[header, form].forEach(element => {
-    contentDiv.appendChild(element);
-});
+    let inputSubmit = document.createElement('input');
+    inputSubmit.setAttribute('type', 'submit');
+    inputSubmit.setAttribute('value', 'Start');
 
-[input, br, inputSubmit].forEach(element => {
-    form.appendChild(element);
-})
+    mainDiv.appendChild(contentDiv);
 
-const sendPost = function(nickName) {
-    const request = new XMLHttpRequest();
-    request.open("POST", "/index", true);
-    request.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            let json = this.responseText;
-            var obj = JSON.parse(json);
-            alert (1 === 1);
-            lobby();
-        };
-    };
-    const data = JSON.stringify({nickName});
-    request.send(data);
-}
-var ileludzi = 5;
-function lobby() {
+    [header, form].forEach(element => {
+        contentDiv.appendChild(element);
+    });
 
-    document.write(ileludzi);
+    [input, br, inputSubmit].forEach(element => {
+        form.appendChild(element);
+    })
 
-    const request = new XMLHttpRequest();
-        request.open("GET", "/index/dupa", true);
+    const sendPost = function(nickName) {
+        const request = new XMLHttpRequest();
+        request.open("POST", "/index", true);
         request.onreadystatechange = function() {
-
             if (this.readyState == 4 && this.status == 200) {
                 let json = this.responseText;
                 var obj = JSON.parse(json);
-                ileludzi = obj;
+                lobby();
             };
         };
+        const data = JSON.stringify({nickName});
+        request.send(data);
+    }
+    var ileludzi = 5;
+    function lobby() {
 
-     request.send();
+        gameBoard();
 
-    setTimeout(() => { lobby();}, 1000);
+//        document.write(ileludzi);
+//
+//        const request = new XMLHttpRequest();
+//            request.open("GET", "/index/dupa", true);
+//            request.onreadystatechange = function() {
+//
+//                if (this.readyState == 4 && this.status == 200) {
+//                    let json = this.responseText;
+//                    var obj = JSON.parse(json);
+//                    ileludzi = obj;
+//                };
+//            };
+//
+//         request.send();
+//
+//        setTimeout(() => { lobby();}, 1000);
+    }
+
+
+    }
 }
+

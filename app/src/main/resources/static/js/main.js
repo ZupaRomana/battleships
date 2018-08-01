@@ -1,9 +1,15 @@
 "use strict";
 
-let mainContent = document.querySelector('#main-container');
-import { GameBoard } from "./GameBoard.js";
-let container = document.createElement("div");
-container.setAttribute("class", "game-boards-container");
-container.appendChild(new GameBoard().getGameBoard());
-container.appendChild(new GameBoard().getGameBoard());
-mainContent.appendChild(container);
+
+import { GameBoardsContainer } from "./GameBoardsContainer.js";
+import { Welcome } from "./welcomePage.js";
+
+//let welcome = new Welcome();
+//welcome.run();
+
+//export let gameBoard = function() {
+let gameBoardsContainer = new GameBoardsContainer();
+document.getElementById("main-container").appendChild(gameBoardsContainer.container);
+
+gameBoardsContainer.scaleGameBoardToBrowserZoomLevel();
+//}
