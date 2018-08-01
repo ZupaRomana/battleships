@@ -8,6 +8,26 @@ export class GameBoardUpdater {
         return JSON.stringify(gameBoardContainer);
     }
 
+    postJSONToServer(json) {
+        let httpExec = new XMLHttpRequest();
+        httpExec.onreadystatechange = () => {
+            // sprawdz w questorze czym to sie rozni 
+            console.log(`Http: ${httpExec.responseText} This: ${this.responseText}`);
+        };
+        httpExec.open("POST", "", true);
+        httpExec.send(json);
+    }
+
+    getJSONFromServer() {
+        let httpExec = new XMLHttpRequest();
+        httpExec.onreadystatechange = () => {
+            // sprawdz w questorze czym to sie rozni 
+            console.log(`Http: ${httpExec.responseText} This: ${this.responseText}`);
+        };
+        httpExec.open("GET", "", true);
+        httpExec.send();
+    }
+
     parseJSONToObject(json) { 
         return JSON.parse(json);
     }
