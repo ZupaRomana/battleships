@@ -14,7 +14,7 @@ export class GameBoardUpdater {
             // sprawdz w questorze czym to sie rozni 
             console.log(`Http: ${httpExec.responseText} This: ${this.responseText}`);
         };
-        httpExec.open("POST", "", true);
+        httpExec.open("POST", "/gameBoardUpdater", true);
         httpExec.send(json);
     }
 
@@ -24,7 +24,7 @@ export class GameBoardUpdater {
             // sprawdz w questorze czym to sie rozni 
             console.log(`Http: ${httpExec.responseText} This: ${this.responseText}`);
         };
-        httpExec.open("GET", "", true);
+        httpExec.open("GET", "/gameBoardUpdater", true);
         httpExec.send();
     }
 
