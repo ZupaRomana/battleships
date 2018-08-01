@@ -84,6 +84,11 @@ export class GameBoard {
             }
         };
         htmlSquare.addEventListener("click", onClick);
+        htmlSquare.addEventListener("mouseover", () => {
+            if (square.isHit | square.isMiss) {
+                htmlSquare.removeEventListener("click", onClick);
+            }
+        });
     }
 
     changeCornerSquaresToMiss(square) {
