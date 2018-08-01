@@ -93,3 +93,41 @@ input[type=submit]:hover {
 input:hover {
     background-color: #E3E3E3;
 }
+
+#lobby {
+    width: 100%;
+    display: flex;
+    flex-flow: column wrap;
+}
+
+#lobby-header {
+    width: 100%;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+    background-color: #CCCCFF;
+    margin: 2%;
+    font-size: 34px;
+}
+
+#lobby-info {
+    width: 100%;
+    margin: 2%;
+    text-align: center;
+    background-color: #BBBBFF;
+    font-size: 44px;
+}
+
+#lobby-rooms-container {
+    width: 100%;
+    margin: 2%;
+    display: flex;
+    flex-flow: row wrap;
+    background-color: #AAAAFF;
+}
+
+.room {
+    min-width: 15%;
+    min-height: 100px;
+    background-color: #8888FF;
+}
