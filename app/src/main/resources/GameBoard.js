@@ -7,6 +7,9 @@ export class GameBoard {
         this.gameBoard = [];
         this.isPlayer = isPlayer;
         this.loadSquares();
+        this.getBoard = function() {
+            return this.gameBoard;
+        };
     }
 
     loadSquares() {
@@ -15,7 +18,17 @@ export class GameBoard {
                 let square = new Square();
                 square.xPos = xPos;
                 square.yPos = yPos;
+                square.loadDiv();
                 this.gameBoard.push(square);
+            }
+        }
+    }
+
+    getSquare(xPos, yPos) {
+
+        for (let square of this.gameBoard) {
+            if (square.xPos == xPos && square.yPos == yPos) {
+                return square;
             }
         }
     }
