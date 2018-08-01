@@ -5,33 +5,33 @@ import { GameBoard } from "./GameBoard.js";
 showTactics();
 function showTactics() {
     let mainContainer = document.getElementById("main-container");
-    // document.body.appendChild(mainContainer);
 
     let resetButton = document.createElement("button");
     resetButton.setAttribute("id", "resetButton");
     resetButton.textContent = "RESET";
     mainContainer.appendChild(resetButton);
 
-    let map = new GameBoard().getGameBoard();
+    let gameboard = new GameBoard();
+    let map = gameboard.getPlayerGameBoard();
     mainContainer.appendChild(map);
     resetButton.addEventListener("click", function () {
-        resetMap(mainContainer);
-        resetShips();
+        let newGameBoard = resetMap(gameboard, mainContainer);
+        resetShips(newGameBoard);
     });
 
     createShipsContainer(mainContainer);
 
 }
-function resetMap(mainContainer) {
+function resetMap(gameboard, mainContainer) {
+    
     mainContainer.removeChild(document.querySelector(".game-board"));
-    let map = new GameBoard().getGameBoard();
-    mainContainer.appendChild(map);
+    let newGameBoard = new GameBoard();
+    let newMap = newGameBoard.getPlayerGameBoard();
+    mainContainer.appendChild(newMap);
     let container = document.querySelector("#shipsContainer");
-    while (container.hasChildNodes()) {
-        container.removeChild(container.lastChild);
-    }
     container.remove();
     createShipsContainer(mainContainer);
+    return newGameBoard;
 }
 
 function createShipsContainer(mainContainer) {
@@ -42,10 +42,10 @@ function createShipsContainer(mainContainer) {
 }
 
 
-function resetShips() {
+function resetShips(map) {
 
     [1, 1, 1, 1, 2, 2, 2, 3, 3, 4].forEach(element => {
-        let ship = new Ship(element);
+        let ship = new Ship(element, map);
         ship.resetShip();
     });
     document.getElementById("resetButton").setAttribute("disabled", true);
