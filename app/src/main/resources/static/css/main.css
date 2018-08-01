@@ -95,39 +95,42 @@ input:hover {
 }
 
 #lobby {
+    min-height: 100%;
     width: 100%;
     display: flex;
     flex-flow: column wrap;
 }
 
 #lobby-header {
-    width: 100%;
+    width: 96%;
     display: flex;
     flex-flow: row wrap;
     justify-content: space-around;
     background-color: #CCCCFF;
-    margin: 2%;
+    padding: 2%;
     font-size: 34px;
 }
 
 #lobby-info {
-    width: 100%;
-    margin: 2%;
+    width: 96%;
+    padding: 2%;
     text-align: center;
     background-color: #BBBBFF;
     font-size: 44px;
 }
 
 #lobby-rooms-container {
-    width: 100%;
-    margin: 2%;
+    min-height: 80vh;
+    width: 96%;
+    padding: 2%;
     display: flex;
     flex-flow: row wrap;
     background-color: #AAAAFF;
 }
 
 .room {
-    min-width: 15%;
-    min-height: 100px;
+    margin: 2%;
+    width: 200px;
+    height: 200px;
     background-color: #8888FF;
 }

@@ -1,6 +1,7 @@
 "use strict";
 
 import { GameBoardsContainer } from "./GameBoardsContainer.js";
+import { Lobby } from "./Lobby.js";
 
 export class LoginPage {
 
@@ -67,10 +68,12 @@ function logIn() {
     request.open("POST", "/index", true);
     const data = JSON.stringify({nickName});
     request.send(data);
-    lobby();
+    
+    let lobby = new Lobby();
+    lobby.launch();
 };
 
-function lobby() {
+// function lobby() {
 //
 //     let gameBoardsContainer = new GameBoardsContainer();
 //     document.getElementById("main-container").appendChild(gameBoardsContainer.container);
@@ -91,4 +94,4 @@ function lobby() {
 //         request.send();
 //
 //        setTimeout(() => { lobby();}, 1000);
-}
+// }
