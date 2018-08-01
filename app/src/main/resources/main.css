@@ -98,11 +98,13 @@ input:hover {
 }
 
 #shipsContainer {
+    height: 13%;
     margin-top: 1%;
     width: 100%;
     background-color: green;
     display: flex;
     justify-content: space-between;
+    align-items: center;
     flex-flow: wrap;
 }
 
