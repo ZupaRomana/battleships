@@ -3,30 +3,47 @@
 import { GameBoardsContainer } from "./GameBoardsContainer.js";
 
 export class LoginPage {
+
     constructor(){};
-    run() {
 
-    let mainDiv = document.querySelector('#main-container');
+    launch() {
 
-    let contentDiv = document.createElement('div');
+        constructBody();
+        handleSubmit();
+
+        function handleSubmit() {
+            const form = document.querySelector('#submits-container');
+            form.addEventListener('submit', function(event){
+                event.preventDefault();
+                logIn();
+            });
+        };
+
+    };
+}
+
+function constructBody() {
+
+    const mainDiv = document.querySelector('#main-container');
+
+    const contentDiv = document.createElement('div');
     contentDiv.setAttribute('id', 'content-container');
 
-    let header = document.createElement('header');
+    const header = document.createElement('header');
     header.innerHTML = 'Battleships v1.1';
 
-    let form = document.createElement('form');
+    const form = document.createElement('form');
     form.setAttribute('id', 'submits-container');
-    form.addEventListener(`submit`, () => sendPost(document.querySelector('#nick-name').value));
 
-    let input = document.createElement('input');
+    const input = document.createElement('input');
     input.setAttribute('id', 'nick-name')
     input.setAttribute('type', 'text');
     input.setAttribute('placeholder', 'Enter your name');
     input.setAttribute('required', '');
 
-    let br = document.createElement('br');
+    const br = document.createElement('br');
 
-    let inputSubmit = document.createElement('input');
+    const inputSubmit = document.createElement('input');
     inputSubmit.setAttribute('type', 'submit');
     inputSubmit.setAttribute('value', 'Start');
 
@@ -38,34 +55,34 @@ export class LoginPage {
 
     [input, br, inputSubmit].forEach(element => {
         form.appendChild(element);
-    })
+    });
 
-    const sendPost = function(nickName) {
-        const request = new XMLHttpRequest();
-        request.open("POST", "/index", true);
-        request.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                let json = this.responseText;
-                var obj = JSON.parse(json);
-                lobby();
-            };
-        };
-        const data = JSON.stringify({nickName});
-        request.send(data);
-    }
-    var ileludzi = 5;
-    function lobby() {
+};
 
-        gameBoard();
+function logIn() {
 
+    const nickName = document.querySelector('#nick-name').value;
+
+    const request = new XMLHttpRequest();
+    request.open("POST", "/index", true);
+    const data = JSON.stringify({nickName});
+    request.send(data);
+    lobby();
+};
+
+function lobby() {
+//
+//     let gameBoardsContainer = new GameBoardsContainer();
+//     document.getElementById("main-container").appendChild(gameBoardsContainer.container);
+//     gameBoardsContainer.scaleGameBoardToBrowserZoomLevel();
 //        document.write(ileludzi);
 //
 //        const request = new XMLHttpRequest();
-//            request.open("GET", "/index/dupa", true);
+//            request.open("GET", "/index/test", true);
 //            request.onreadystatechange = function() {
 //
 //                if (this.readyState == 4 && this.status == 200) {
-//                    let json = this.responseText;
+//                    const json = this.responseText;
 //                    var obj = JSON.parse(json);
 //                    ileludzi = obj;
 //                };
@@ -74,9 +91,4 @@ export class LoginPage {
 //         request.send();
 //
 //        setTimeout(() => { lobby();}, 1000);
-    }
-
-
-    }
 }
-
