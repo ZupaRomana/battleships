@@ -1,8 +1,8 @@
 "use strict";
 
-//import { gameBoard } from "./main.js";
+import { GameBoardsContainer } from "./GameBoardsContainer.js";
 
-export class Welcome {
+export class LoginPage {
     constructor(){};
     run() {
 

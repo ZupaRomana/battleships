@@ -111,13 +111,13 @@ public class LoginPage implements HttpHandler {
     private static Map<String, String> parseFormData(String formData) throws UnsupportedEncodingException
     {
         Map<String, String> map = new HashMap<>();
-        formData = removeFuckingKurwa(formData);
+        formData = split(formData);
         String[] pairs = formData.split(":");
         map.put(pairs[0], pairs[1]);
         return map;
     }
 
-    private static String removeFuckingKurwa(String toSplit)
+    private static String split(String toSplit)
     {
         toSplit = toSplit.replace("{", "");
         toSplit = toSplit.replace("}", "");
