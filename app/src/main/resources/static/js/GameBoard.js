@@ -1,7 +1,7 @@
 "use strict";
 
 import { Square } from "./Square.js";
-
+import { Ship } from "./ship.js"
 export class GameBoard {
     constructor(isPlayer = true) {
         this.gameBoard = [];
@@ -43,6 +43,7 @@ export class GameBoard {
     }
 
     getPlayerGameBoard() {
+        let localStorageMap = localStorage.getItem("map");
         let gameBoard = this.getGameBoardDiv();
     
         for (let i = 0; i < this.gameBoard.length; i++) {
