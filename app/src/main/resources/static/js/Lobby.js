@@ -1,5 +1,6 @@
 "use strict";
 
+import {tactics} from "./tactics.js";
 var onlinePlayers = 0;
 
 const INDEX_ROOM_ID = 1;
@@ -37,7 +38,10 @@ function constructBody() {
     lobbyHeader.appendChild(lobbyHeaderPlayersCount);
 
     const lobbyHeaderYourTacticsButton = document.createElement('button');
-    lobbyHeaderYourTacticsButton.textContent = "Your tactics (nie dziala)";
+    lobbyHeaderYourTacticsButton.textContent = "Your tactics";
+
+    lobbyHeaderYourTacticsButton.addEventListener("click", function() { 
+        new tactics().showTactics()});
     lobbyHeader.appendChild(lobbyHeaderYourTacticsButton);
 
     const lobbyInfo = document.createElement('div');
@@ -57,14 +61,6 @@ function constructBody() {
     lobbyRoomsContainer.setAttribute('id', 'lobby-rooms-container');
     lobby.appendChild(lobbyRoomsContainer);
 
-
-//    const room2 = document.createElement('div');
-//    room2.setAttribute('class', 'room');
-//    room2.addEventListener('click', () => {
-//        console.log("ok");
-//        redirectToGameRoom();
-//    })
-//    lobbyRoomsContainer.appendChild(room2);
 }
 
 function sendPostCreateNewRoom() {
@@ -86,12 +82,15 @@ function redirectToGameRoom() {
 }
 
 function fillRooms() {
-    const roomsContainer = document.querySelector('#lobby-rooms-container');
 
-    const request = new XMLHttpRequest();
-    request.onreadystatechange = function() {
+    console.log("wwewqe");
+
+     const request = new XMLHttpRequest();
+
+     request.onreadystatechange = function() {
 
         if (this.readyState == 4 && this.status == 200) {
+        console.log("wwewqe2222");
             onlinePlayers = JSON.parse(this.responseText)[0];
             let array = JSON.parse(this.responseText)[1];
 
@@ -101,10 +100,8 @@ function fillRooms() {
             buildRooms(array);
         };
     };
-
     request.open("GET", "/index/count", true);
     request.send();
-
     setTimeout(() => { fillRooms();}, 1000);
 }
 
@@ -129,12 +126,13 @@ function buildRooms(array) {
                 roomDiv.appendChild(p1Div);
 
                 let p2Div = document.createElement("div");
-                p2Div.innerHTML = room[INDEX_CLIENT_NAME] == "null" ? "free" : "P1: " + room[INDEX_CLIENT_NAME];
+                p2Div.innerHTML = room[INDEX_CLIENT_NAME] == "null" ? "FREE" : "P1: " + room[INDEX_CLIENT_NAME];
                 roomDiv.appendChild(p2Div);
 
                 if (room[INDEX_CLIENT_NAME] == "null") {
                     let joinButton = document.createElement("button");
-                    joinButton.setAttribute("value", "join");
+                    joinButton.setAttribute("id", "join-button");
+                    joinButton.textContent = "JOIN";
                     roomDiv.appendChild(joinButton);
                 }
 
