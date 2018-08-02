@@ -232,6 +232,7 @@ input:hover {
     background-color: #CCCCFF;
     padding: 2%;
     font-size: 34px;
+    min-height: 10vh;
 }
 
 #lobby-info {
@@ -243,7 +244,7 @@ input:hover {
 }
 
 #lobby-rooms-container {
-    min-height: 80vh;
+    min-height: 60vh;
     width: 96%;
     padding: 2%;
     display: flex;
@@ -256,4 +257,30 @@ input:hover {
     width: 200px;
     height: 200px;
     background-color: #8888FF;
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: space-around;
+    align-items: center;
+}
+
+#create-new-room {
+    padding: 2%;
+    width: 96%;
+    min-height: 20vh;
+    background-color: #8888FF;
+    font-size: 44px;
+    text-align: center;
+}
+
+#create-new-room:hover {
+    background-color: #AADDFF;
+    cursor: pointer;
+}
+
+.room:hover {
+    cursor: pointer;
+}
+
+#join-button {
+    width: 50%;
 }
