@@ -50,23 +50,6 @@ export class GameBoardUpdater {
         console.log(this.httpExec.responseText + " respone text");
     }
 
-    getEnemyMap() {
-        let map;
-        this.httpExec.onreadystatechange = () => {
-            if (this.httpExec.readyState == 4 && this.httpExec.status == 200) {
-                map = this.httpExec.responseText;
-            }
-        };
-        this.httpExec.open("GET", "/gameBoardUpdater", true);
-        this.httpExec.send(null);
-        console.log(map + " map");
-        return map;
-    }
-
-    parseJSONToObject(json) {
-        return JSON.parse(json);
-    }
-
     updatePlayerMap(json, actualGameBoards) {
         let receivedGameBoards = this.parseJSONToObject(json).gameBoards;
         let actualGameBoard = this.getActualPlayerGameBoard(actualGameBoards);
