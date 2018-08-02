@@ -1,4 +1,5 @@
 "use strict";
+import {gameBoard} from "./main.js";
 
 var onlinePlayers = 0;
 
@@ -54,13 +55,13 @@ function constructBody() {
 
 function redirectToGameRoom() {
     const request = new XMLHttpRequest();
-
     request.open("GET", "/gameBoardUpdater", true);
     request.send();
+    gameBoard();
 }
 
 function fillRooms() {
-    const roomsContainer = document.querySelector('#lobby-rooms-container');
+    /*const roomsContainer = document.querySelector('#lobby-rooms-container');
 
     const request = new XMLHttpRequest();
     request.onreadystatechange = function() {
@@ -76,5 +77,5 @@ function fillRooms() {
     request.open("GET", "/index/count", true);
     request.send();
 
-    setTimeout(() => { fillRooms();}, 1000);
+    setTimeout(() => { fillRooms();}, 1000);*/
 }
