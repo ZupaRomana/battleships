@@ -8,16 +8,15 @@ import org.json.JSONArray;
 import java.io.*;
 import java.net.HttpCookie;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.UUID;
+import java.util.*;
 
 public class LoginPage implements HttpHandler {
 
     private String response;
     private String method;
     private HttpExchange httpExchange;
+    private static int counter = 0;
+    private static List<String> nickNames = new ArrayList<>();
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException
@@ -28,10 +27,10 @@ public class LoginPage implements HttpHandler {
 
         if (isGetMethod()) {
             prepareResponse();
-            sendResponse();
         } else {
             catchData();
         }
+        sendResponse();
     }
 
     private boolean isGetMethod()
@@ -47,9 +46,49 @@ public class LoginPage implements HttpHandler {
             case "index":
                 buildIndexHtml();
                 break;
+            case "count":
+                manageCookies();
+                buildJSON();
+                break;
             default:
                 buildIndexHtml();
         }
+    }
+
+    private void manageCookies()
+    {
+
+        System.out.println(counter);
+//        if (counter >= 10) {
+            AccountContainer.getInstance().clear();
+            List<String> cookiesss = httpExchange.getRequestHeaders().get("Cookie");
+            String[] eee = cookiesss.get(0).split(";");
+            List<String> cookies = new ArrayList<String>(Arrays.asList(eee));
+
+            String session = null;
+            String nick = null;
+
+            if (cookies.size() == 2) {
+                HttpCookie sessionId = HttpCookie.parse(cookies.get(0)).get(0);
+                HttpCookie nickName = HttpCookie.parse(cookies.get(1)).get(0);
+                session = sessionId.toString().split("=")[1];
+                nick = nickName.toString().split("=")[1];
+            }
+
+            if (session != null && nickNames.contains(nick)) {
+                AccountContainer.getInstance().add(session, nick);
+            }
+
+//            counter = 0;
+//        }
+        counter++;
+    }
+
+    private void buildJSON()
+    {
+        JSONArray jsonArray = new JSONArray();
+        jsonArray.put(AccountContainer.getInstance().getSize());
+        response = jsonArray.toString();
     }
 
     private void sendResponse() throws IOException
@@ -88,9 +127,13 @@ public class LoginPage implements HttpHandler {
         System.out.println(nickName + " has entered the game!");
 
         accountContainer.add(uuid, nickName);
+        nickNames.add(nickName);
 
         HttpCookie httpCookie = new HttpCookie("sessionId", uuid);
+        HttpCookie cookieNick = new HttpCookie("nickName", nickName);
+
         httpExchange.getResponseHeaders().add("Set-Cookie", httpCookie.toString());
+        httpExchange.getResponseHeaders().add("Set-Cookie", cookieNick.toString());
     }
 
     private static Map<String, String> parseFormData(String formData)
