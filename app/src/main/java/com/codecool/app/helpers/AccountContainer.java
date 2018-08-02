@@ -40,6 +40,10 @@ public class AccountContainer {
         }
     }
 
+    public void clear() {
+        sessionIdNickname.clear();
+    }
+
     public int getSize() { return sessionIdNickname.keySet().size();}
 
 }

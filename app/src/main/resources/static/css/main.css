@@ -93,6 +93,7 @@ input:hover {
     background-color: #E3E3E3;
 }
 
+
 .free-ship {
     width: auto;
 }
@@ -126,4 +127,50 @@ input:hover {
 
 .ship4 {
     width: 204px;
+}
+
+#lobby {
+    min-height: 100%;
+    width: 100%;
+    display: flex;
+    flex-flow: column wrap;
+}
+
+#lobby-header {
+    width: 96%;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+    background-color: #CCCCFF;
+    padding: 2%;
+    font-size: 34px;
+}
+
+#lobby-info {
+    width: 96%;
+    padding: 2%;
+    text-align: center;
+    background-color: #BBBBFF;
+    font-size: 44px;
+}
+
+#lobby-rooms-container {
+    min-height: 80vh;
+    width: 96%;
+    padding: 2%;
+    display: flex;
+    flex-flow: row wrap;
+    background-color: #AAAAFF;
+}
+
+.room {
+    margin: 2%;
+    width: 200px;
+    height: 200px;
+    background-color: #8888FF;
+}
+
+.room:hover {
+    cursor: pointer;
+
 }
