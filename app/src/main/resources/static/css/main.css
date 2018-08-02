@@ -133,6 +133,23 @@ input:hover {
     width: 200px;
     height: 200px;
     background-color: #8888FF;
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: space-around;
+    align-items: center;
+}
+
+#create-new-room {
+    margin: 2%;
+    width: 200px;
+    height: 200px;
+    background-color: #8888FF;
+    font-size: 44px;
+}
+
+#create-new-room:hover {
+    background-color: #AAAAFF;
+    cursor: pointer;
 }
 
 .room:hover {
