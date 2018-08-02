@@ -43,9 +43,20 @@ function constructBody() {
     lobbyRoomsContainer.setAttribute('id', 'lobby-rooms-container');
     lobby.appendChild(lobbyRoomsContainer);
 
-//    const room2 = document.createElement('div');
-//    room2.setAttribute('class', 'room');
-//    lobbyRoomsContainer.appendChild(room2);
+    const room2 = document.createElement('div');
+    room2.setAttribute('class', 'room');
+    room2.addEventListener('click', () => {
+        console.log("ok");
+        redirectToGameRoom();
+    })
+    lobbyRoomsContainer.appendChild(room2);
+}
+
+function redirectToGameRoom() {
+    const request = new XMLHttpRequest();
+
+    request.open("GET", "/gameBoardUpdater", true);
+    request.send();
 }
 
 function fillRooms() {
