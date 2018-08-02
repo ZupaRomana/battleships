@@ -14,22 +14,20 @@ export class GameBoardsContainer {
         this.container = document.createElement("div");
         this.container.setAttribute("class", "game-boards-container");
         this.fillContaier();
-        this.container.addEventListener("click", () => {
-            let json = this.gameBoardUpdater.parseGameBoardContainerToJSON(this);
-            this.gameBoardUpdater.updatePlayerMap(json, this.gameBoards);
-            this.gameBoardUpdater.getJSONFromServer();
-        });
+            this.container.addEventListener("dblclick", () => {
+                this.gameBoardUpdater.getJSONFromServerAndUpdateMap(this.gameBoards);
+         });
     }
 
     fillContaier() {
         for (let gameBoard of this.gameBoards) {
-            this.container.appendChild(gameBoard.getGameBoard());
+            this.container.appendChild(gameBoard.getGameBoard(this.gameBoardUpdater, this));
         }
     }
 
     scaleGameBoardToBrowserZoomLevel() {
-        let browserZoomLevel = Math.round(window.devicePixelRatio * 100);
         window.setInterval(() => {
+        let browserZoomLevel = Math.round(window.devicePixelRatio * 100);
         let multipler = browserZoomLevel / 100;
         if (browserZoomLevel > 100) {
             this.container.style.width = `${100 / multipler}%`;
