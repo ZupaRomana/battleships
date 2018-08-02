@@ -14,9 +14,6 @@ export class GameBoardsContainer {
         this.container = document.createElement("div");
         this.container.setAttribute("class", "game-boards-container");
         this.fillContaier();
-            this.container.addEventListener("dblclick", () => {
-                this.gameBoardUpdater.getJSONFromServerAndUpdateMap(this.gameBoards);
-         });
     }
 
     fillContaier() {
@@ -26,17 +23,31 @@ export class GameBoardsContainer {
     }
 
     scaleGameBoardToBrowserZoomLevel() {
+        let updateMap = () => {
+            try { 
+                if (!this.gameBoardUpdater.isBeginOfGame) {
+                    this.gameBoardUpdater.getJSONFromServerAndUpdateMap(this.gameBoards);
+                } else {
+                    this.gameBoardUpdater.isBeginOfGame = true;
+                    console.log("timeout");
+                }
+            } catch(err) {
+                console.log(err.message);
+            }
+        };
+
         window.setInterval(() => {
-        let browserZoomLevel = Math.round(window.devicePixelRatio * 100);
-        let multipler = browserZoomLevel / 100;
-        if (browserZoomLevel > 100) {
-            this.container.style.width = `${100 / multipler}%`;
-            this.container.style.height = `${100 / multipler}%`;
-        } else {
-            this.container.style.width = `${100}%`;
-            this.container.style.height = `${100}%`;
-        }
-        GameBoard.setSizeOfGameBoards(this.gameBoards);
-        });
+            updateMap()
+            let browserZoomLevel = Math.round(window.devicePixelRatio * 100);
+            let multipler = browserZoomLevel / 100;
+            if (browserZoomLevel > 100) {
+                this.container.style.width = `${100 / multipler}%`;
+                this.container.style.height = `${100 / multipler}%`;
+            } else {
+                this.container.style.width = `${100}%`;
+                this.container.style.height = `${100}%`;
+            }
+            GameBoard.setSizeOfGameBoards(this.gameBoards);
+        }, 3000);
     }
 }
