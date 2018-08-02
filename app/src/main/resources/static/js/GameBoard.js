@@ -20,11 +20,11 @@ export class GameBoard {
         }
     }
 
-    getGameBoard() {
+    getGameBoard(gameBoardUpdater, container) {
         if (this.isPlayer) {
             return this.getPlayerGameBoard();
         } else {
-            return this.getEnemyGameBoard();
+            return this.getEnemyGameBoard(gameBoardUpdater, container);
         }
     }
 
@@ -52,7 +52,7 @@ export class GameBoard {
         return gameBoard;
     }
 
-    getEnemyGameBoard() {
+    getEnemyGameBoard(gameBoardUpdater, container) {
         let gameBoard = this.getGameBoardDiv();
         
         for (let i = 0; i < this.gameBoard.length; i++) {
@@ -60,13 +60,13 @@ export class GameBoard {
             if (i % 2 === 0) {
                 square.isShip = true;
             } 
-            this.setEnemyGameBoardColorAddEvent(square);
+            this.setEnemyGameBoardColorAddEvent(square, gameBoardUpdater, container);
         }
         gameBoard.style.border = "2px solid black";
         return gameBoard;
     }
 
-    setEnemyGameBoardColorAddEvent(square) {
+    setEnemyGameBoardColorAddEvent(square, gameBoardUpdater, container) {
         let htmlSquare = square.div;
         htmlSquare.style.backgroundColor = "cyan";
         let onClick = (e) => {
@@ -82,8 +82,10 @@ export class GameBoard {
             if (square.isHit | square.isMiss) {
                 htmlSquare.removeEventListener("click", onClick);
             }
+            gameBoardUpdater.postJSONToServer(gameBoardUpdater.parseGameBoardContainerToJSON(container));
         };
         htmlSquare.addEventListener("click", onClick);
+
         htmlSquare.addEventListener("mouseover", () => {
             if (square.isHit | square.isMiss) {
                 htmlSquare.removeEventListener("click", onClick);
