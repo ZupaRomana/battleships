@@ -1,5 +1,6 @@
 "use strict";
 
+import {tactics} from "./tactics.js";
 var onlinePlayers = 0;
 
 export class Lobby {
@@ -31,7 +32,10 @@ function constructBody() {
     lobbyHeader.appendChild(lobbyHeaderPlayersCount);
 
     const lobbyHeaderYourTacticsButton = document.createElement('button');
-    lobbyHeaderYourTacticsButton.textContent = "Your tactics (nie dziala)";
+    lobbyHeaderYourTacticsButton.textContent = "Your tactics";
+
+    lobbyHeaderYourTacticsButton.addEventListener("click", function() { 
+        new tactics().showTactics()});
     lobbyHeader.appendChild(lobbyHeaderYourTacticsButton);
 
     const lobbyInfo = document.createElement('div');
@@ -49,21 +53,21 @@ function constructBody() {
 }
 
 function fillRooms() {
-    const roomsContainer = document.querySelector('#lobby-rooms-container');
+    // const roomsContainer = document.querySelector('#lobby-rooms-container');
 
-    const request = new XMLHttpRequest();
-    request.onreadystatechange = function() {
+    // const request = new XMLHttpRequest();
+    // request.onreadystatechange = function() {
 
-        if (this.readyState == 4 && this.status == 200) {
-            onlinePlayers = JSON.parse(this.responseText)[0];
+    //     if (this.readyState == 4 && this.status == 200) {
+    //         onlinePlayers = JSON.parse(this.responseText)[0];
 
-            let lobbyHeaderPlayersCount = document.querySelector('#counter');
-            lobbyHeaderPlayersCount.innerHTML = `Players online: ${onlinePlayers}`;
-        };
-    };
+    //         let lobbyHeaderPlayersCount = document.querySelector('#counter');
+    //         lobbyHeaderPlayersCount.innerHTML = `Players online: ${onlinePlayers}`;
+    //     };
+    // };
 
-    request.open("GET", "/index/count", true);
-    request.send();
+    // request.open("GET", "/index/count", true);
+    // request.send();
 
-    setTimeout(() => { fillRooms();}, 1000);
+    // setTimeout(() => { fillRooms();}, 1000);
 }
