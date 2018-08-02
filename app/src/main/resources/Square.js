@@ -7,9 +7,6 @@ export class Square {
                 this.div.style.backgroundColor = "red";
             } else if (this.isMiss) {
                 this.div.style.backgroundColor = "white";
-            } else if (this.isShip) {
-                this.div.style.backgroundColor = "black";
-            }
         }
         this.getHTMLSquare = function() {
             return this.div;
