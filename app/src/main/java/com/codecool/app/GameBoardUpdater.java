@@ -21,21 +21,15 @@ public class GameBoardUpdater implements HttpHandler {
 
         String cookieStr = httpExchange.getRequestHeaders().getFirst("Cookie");
         String method = httpExchange.getRequestMethod();
-//        HttpCookie cookie = cookie = HttpCookie.parse(cookieStr).get(0);
+        HttpCookie cookie = cookie = HttpCookie.parse(cookieStr).get(0);
 
         System.out.println(method + " - " + cookieStr);
         if (method.equals("POST")) {
             getGameState(httpExchange);
-            if (cookieStr != null) {
-                HttpCookie cookie = HttpCookie.parse(cookieStr).get(0);
-                lastPostSessionId = cookie.getValue();
-            }
-            //lastPostSessionId = cookie.getValue();
+            lastPostSessionId = cookie.getValue();
         } else if (method.equals("GET")) {
-            if (cookieStr != null) {
-                HttpCookie cookie = HttpCookie.parse(cookieStr).get(0);
-                lastGetSessionId = cookie.getValue();
-            }
+            lastGetSessionId = cookie.getValue();
+            System.out.println(lastPostSessionId + " <- POST GET - >" + lastGetSessionId);
             sendGameState(httpExchange);
         }
     }
@@ -49,7 +43,6 @@ public class GameBoardUpdater implements HttpHandler {
             bytes[i] = byteList.get(i);
         }
         gameState  = new String(bytes);
-        System.out.println(gameState);
     }
 
     private List<Byte> getBytesList(InputStream is) {
@@ -68,16 +61,15 @@ public class GameBoardUpdater implements HttpHandler {
 
     public void sendGameState(HttpExchange httpExchange) {
         OutputStream os = httpExchange.getResponseBody();
-        //if (lastGetSessionId != lastPostSessionId) {
+        if (!lastGetSessionId.equals(lastPostSessionId)) {
             try {
                 httpExchange.getResponseHeaders().set("Content-Type", "application/json");
                 httpExchange.sendResponseHeaders(200, gameState.length());
                 os.write(gameState.getBytes());
                 os.close();
-                System.out.println("\u001B[31m" + new String(gameState.getBytes()) + "\u001B[0m");
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        //}
+        }
     }
 }
