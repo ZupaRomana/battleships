@@ -84,14 +84,11 @@ function redirectToGameRoom() {
 
 function fillRooms() {
 
-    console.log("wwewqe");
-
      const request = new XMLHttpRequest();
 
      request.onreadystatechange = function() {
 
         if (this.readyState == 4 && this.status == 200) {
-        console.log("wwewqe2222");
             onlinePlayers = JSON.parse(this.responseText)[0];
             let array = JSON.parse(this.responseText)[1];
 
