@@ -7,6 +7,9 @@ export class GameBoard {
         this.gameBoard = [];
         this.isPlayer = isPlayer;
         this.loadSquares();
+        this.getBoard = function () {
+            return this.gameBoard;
+        };
     }
 
     loadSquares() {
@@ -91,6 +94,15 @@ export class GameBoard {
                 htmlSquare.removeEventListener("click", onClick);
             }
         });
+    }
+
+    getSquare(xPos, yPos) {
+
+        for (let square of this.gameBoard) {
+            if (square.xPos == xPos && square.yPos == yPos) {
+                return square;
+            }
+        }
     }
 
     changeCornerSquaresToMiss(square) {
