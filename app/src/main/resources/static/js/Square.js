@@ -2,7 +2,7 @@
 
 export class Square {
     constructor() {
-        this.loadDiv();
+//        this.loadDiv();
         this.updateDivColor = function() {
             if (this.isShip & this.isHit) {
                 this.div.style.backgroundColor = "red";
