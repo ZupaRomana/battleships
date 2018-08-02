@@ -1,6 +1,7 @@
 "use strict";
 import { Square } from "./Square.js";
 import { GameBoard } from "./GameBoard.js";
+import { GameBoardUpdater } from "./GameBoardUpdater.js";
 
 var ships = [];
 var _map = [];
@@ -88,9 +89,10 @@ function checkShipsAmount() {
 }
 
 function saveToLocalStorage() {
-
     let allSquares = JSON.stringify(_map);
     localStorage.setItem("map", allSquares);
+    let updater = new GameBoardUpdater();
+    updater.postJSONToServer(allSquares, true);
 }
 
 function colorAllSquares(square, ship) {
