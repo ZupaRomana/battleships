@@ -2,6 +2,7 @@
 
 export class GameBoardUpdater {
     constructor() {
+        this.httpExec = new XMLHttpRequest(); 
     }
 
     parseGameBoardContainerToJSON(gameBoardContainer) {
@@ -9,26 +10,23 @@ export class GameBoardUpdater {
     }
 
     postJSONToServer(json) {
-        let httpExec = new XMLHttpRequest();
-        httpExec.onreadystatechange = () => {
-            // sprawdz w questorze czym to sie rozni 
-            console.log(`Http: ${httpExec.responseText} This: ${this.responseText}`);
-        };
-        httpExec.open("POST", "/gameBoardUpdater", true);
-        httpExec.send(json);
+        this.httpExec.open("POST", "/gameBoardUpdater", true);
+        this.httpExec.setRequestHeader("Content-Type", "application/json");
+        this.httpExec.send(json);
     }
 
-    getJSONFromServer() {
-        let httpExec = new XMLHttpRequest();
-        httpExec.onreadystatechange = () => {
-            // sprawdz w questorze czym to sie rozni 
-            console.log(`Http: ${httpExec.responseText} This: ${this.responseText}`);
+    getJSONFromServerAndUpdateMap(actualGameBoards) {
+        this.httpExec.onreadystatechange = () => {
+            if (this.httpExec.readyState == 4 && this.httpExec.status == 200) {
+                this.updatePlayerMap(this.httpExec.responseText, actualGameBoards);
+            }
         };
-        httpExec.open("GET", "/gameBoardUpdater", true);
-        httpExec.send();
+        this.httpExec.open("GET", "/gameBoardUpdater", true);
+        this.httpExec.send(null);
+        console.log(this.httpExec.responseText);
     }
 
-    parseJSONToObject(json) { 
+    parseJSONToObject(json) {
         return JSON.parse(json);
     }
 
@@ -36,11 +34,11 @@ export class GameBoardUpdater {
         let receivedGameBoards = this.parseJSONToObject(json).gameBoards;
         let actualGameBoard = this.getActualPlayerGameBoard(actualGameBoards);
         let receivedGameBoard = this.getReceivedPlayerGameBoard(receivedGameBoards);
-
+        
         for (let i = 0; i < actualGameBoard.gameBoard.length; i++) {
             let actualSquare = actualGameBoard.gameBoard[i];
             let receivedSquare = receivedGameBoard.gameBoard[i];
-
+            
             if (receivedSquare.xPos === actualSquare.xPos & receivedSquare.yPos === actualSquare.yPos) {
                 this.checkAndChangeSquareState(receivedSquare, actualSquare);
                 actualSquare.updateDivColor();
