@@ -1,10 +1,13 @@
 "use strict";
 
+var onlinePlayers = 0;
+
 export class Lobby {
     constructor(){}
 
     launch() {
         constructBody();
+        fillRooms();
     }
 }
 
@@ -23,7 +26,8 @@ function constructBody() {
     lobby.appendChild(lobbyHeader);
 
     const lobbyHeaderPlayersCount = document.createElement('div');
-    lobbyHeaderPlayersCount.innerHTML = "Players online: 538";
+    lobbyHeaderPlayersCount.setAttribute('id', 'counter');
+    lobbyHeaderPlayersCount.innerHTML = `Players online: ${onlinePlayers}`;
     lobbyHeader.appendChild(lobbyHeaderPlayersCount);
 
     const lobbyHeaderYourTacticsButton = document.createElement('button');
@@ -39,11 +43,27 @@ function constructBody() {
     lobbyRoomsContainer.setAttribute('id', 'lobby-rooms-container');
     lobby.appendChild(lobbyRoomsContainer);
 
-    const room1 = document.createElement('div');
-    room1.setAttribute('class', 'room');
-    lobbyRoomsContainer.appendChild(room1);
+//    const room2 = document.createElement('div');
+//    room2.setAttribute('class', 'room');
+//    lobbyRoomsContainer.appendChild(room2);
+}
 
-    const room2 = document.createElement('div');
-    room2.setAttribute('class', 'room');
-    lobbyRoomsContainer.appendChild(room2);
+function fillRooms() {
+    const roomsContainer = document.querySelector('#lobby-rooms-container');
+
+    const request = new XMLHttpRequest();
+    request.onreadystatechange = function() {
+
+        if (this.readyState == 4 && this.status == 200) {
+            onlinePlayers = JSON.parse(this.responseText)[0];
+
+            let lobbyHeaderPlayersCount = document.querySelector('#counter');
+            lobbyHeaderPlayersCount.innerHTML = `Players online: ${onlinePlayers}`;
+        };
+    };
+
+    request.open("GET", "/index/count", true);
+    request.send();
+
+    setTimeout(() => { fillRooms();}, 1000);
 }
