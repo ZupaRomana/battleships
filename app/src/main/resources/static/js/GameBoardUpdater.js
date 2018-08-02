@@ -2,13 +2,31 @@
 
 export class GameBoardUpdater {
     constructor() {
+        this.httpExec = new XMLHttpRequest(); 
     }
 
     parseGameBoardContainerToJSON(gameBoardContainer) {
         return JSON.stringify(gameBoardContainer);
     }
 
-    parseJSONToObject(json) { 
+    postJSONToServer(json) {
+        this.httpExec.open("POST", "/gameBoardUpdater", true);
+        this.httpExec.setRequestHeader("Content-Type", "application/json");
+        this.httpExec.send(json);
+    }
+
+    getJSONFromServerAndUpdateMap(actualGameBoards) {
+        this.httpExec.onreadystatechange = () => {
+            if (this.httpExec.readyState == 4 && this.httpExec.status == 200) {
+                this.updatePlayerMap(this.httpExec.responseText, actualGameBoards);
+            }
+        };
+        this.httpExec.open("GET", "/gameBoardUpdater", true);
+        this.httpExec.send(null);
+        console.log(this.httpExec.responseText);
+    }
+
+    parseJSONToObject(json) {
         return JSON.parse(json);
     }
 
@@ -16,11 +34,11 @@ export class GameBoardUpdater {
         let receivedGameBoards = this.parseJSONToObject(json).gameBoards;
         let actualGameBoard = this.getActualPlayerGameBoard(actualGameBoards);
         let receivedGameBoard = this.getReceivedPlayerGameBoard(receivedGameBoards);
-
+        
         for (let i = 0; i < actualGameBoard.gameBoard.length; i++) {
             let actualSquare = actualGameBoard.gameBoard[i];
             let receivedSquare = receivedGameBoard.gameBoard[i];
-
+            
             if (receivedSquare.xPos === actualSquare.xPos & receivedSquare.yPos === actualSquare.yPos) {
                 this.checkAndChangeSquareState(receivedSquare, actualSquare);
                 actualSquare.updateDivColor();
@@ -47,9 +65,11 @@ export class GameBoardUpdater {
     checkAndChangeSquareState(receivedSquare, actualSquare) {
         if (receivedSquare.isHit !== actualSquare.isHit) {
             actualSquare.isHit = receivedSquare.isHit;
-        } else if (receivedSquare.isMiss !== actualSquare.isMiss) {
+        } 
+        if (receivedSquare.isMiss !== actualSquare.isMiss) {
             actualSquare.isMiss = receivedSquare.isMiss;
-        } else if (receivedSquare.isShip !== actualSquare.isShip) {
+        }
+        if (receivedSquare.isShip !== actualSquare.isShip) {
             actualSquare.isShip = receivedSquare.isShip;
         }
     }

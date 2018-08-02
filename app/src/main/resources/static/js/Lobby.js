@@ -1,4 +1,5 @@
 "use strict";
+import {gameBoard} from "./main.js";
 
 import {tactics} from "./tactics.js";
 var onlinePlayers = 0;
@@ -40,7 +41,7 @@ function constructBody() {
     const lobbyHeaderYourTacticsButton = document.createElement('button');
     lobbyHeaderYourTacticsButton.textContent = "Your tactics";
 
-    lobbyHeaderYourTacticsButton.addEventListener("click", function() { 
+    lobbyHeaderYourTacticsButton.addEventListener("click", function() {
         new tactics().showTactics()});
     lobbyHeader.appendChild(lobbyHeaderYourTacticsButton);
 
@@ -80,18 +81,15 @@ function redirectToGameRoom() {
 
     request.open("GET", "/gameBoardUpdater", true);
     request.send();
+    gameBoard();
 }
 
 function fillRooms() {
-
-    console.log("wwewqe");
-
      const request = new XMLHttpRequest();
 
      request.onreadystatechange = function() {
 
         if (this.readyState == 4 && this.status == 200) {
-        console.log("wwewqe2222");
             onlinePlayers = JSON.parse(this.responseText)[0];
             let array = JSON.parse(this.responseText)[1];
 
