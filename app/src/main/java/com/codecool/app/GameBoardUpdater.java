@@ -3,26 +3,39 @@ package com.codecool.app;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpCookie;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class GameBoardUpdater implements HttpHandler {
 
     private String gameState;
+    private String lastPostSessionId;
+    private String lastGetSessionId;
 
     @Override
     public void handle(HttpExchange httpExchange) {
 
+        String cookieStr = httpExchange.getRequestHeaders().getFirst("Cookie");
         String method = httpExchange.getRequestMethod();
-        System.out.println(method);
+//        HttpCookie cookie = cookie = HttpCookie.parse(cookieStr).get(0);
+
+        System.out.println(method + " - " + cookieStr);
         if (method.equals("POST")) {
             getGameState(httpExchange);
+            if (cookieStr != null) {
+                HttpCookie cookie = HttpCookie.parse(cookieStr).get(0);
+                lastPostSessionId = cookie.getValue();
+            }
+            //lastPostSessionId = cookie.getValue();
         } else if (method.equals("GET")) {
+            if (cookieStr != null) {
+                HttpCookie cookie = HttpCookie.parse(cookieStr).get(0);
+                lastGetSessionId = cookie.getValue();
+            }
             sendGameState(httpExchange);
         }
     }
@@ -55,14 +68,16 @@ public class GameBoardUpdater implements HttpHandler {
 
     public void sendGameState(HttpExchange httpExchange) {
         OutputStream os = httpExchange.getResponseBody();
-        try {
-            httpExchange.getResponseHeaders().set("Content-Type", "application/json");
-            httpExchange.sendResponseHeaders(200, gameState.length());
-            os.write(gameState.getBytes());
-            os.close();
-            System.out.println("\u001B[31m" + new String(gameState.getBytes()) + "\u001B[0m");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        //if (lastGetSessionId != lastPostSessionId) {
+            try {
+                httpExchange.getResponseHeaders().set("Content-Type", "application/json");
+                httpExchange.sendResponseHeaders(200, gameState.length());
+                os.write(gameState.getBytes());
+                os.close();
+                System.out.println("\u001B[31m" + new String(gameState.getBytes()) + "\u001B[0m");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        //}
     }
 }
