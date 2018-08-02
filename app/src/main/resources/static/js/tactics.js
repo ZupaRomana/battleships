@@ -5,92 +5,85 @@ import { Lobby } from "./Lobby.js";
 
 export class tactics {
 
-    constructor() {
-        this.showTactics = function() { 
-            
+    showTactics() {
         let mainContainer = document.getElementById("main-container");
-        mainContainer.innerHTML = "";
-
+    
         let resetButton = document.createElement("button");
         resetButton.setAttribute("id", "resetButton");
         resetButton.textContent = "RESET";
-
+    
         let saveButton = document.createElement("button");
         saveButton.setAttribute("id", "saveButton");
         saveButton.textContent = "SAVE";
-
-        let contextContainer = document.createElement("div");
-        contextContainer.setAttribute("id", "contextContainer");
-
+    
         let localData = localStorage.getItem("map");
         let jsonArray = JSON.parse(localData);
-
+    
         let gameboard = new GameBoard();
-
+    
         let map = gameboard.getPlayerGameBoard(jsonArray);
-
+        
         mainContainer.appendChild(resetButton);
         mainContainer.appendChild(saveButton);
-        contextContainer.appendChild(map);
-        mainContainer.appendChild(contextContainer);
-
-        saveButton.addEventListener("click", function () {
+        mainContainer.appendChild(map);
+        
+        saveButton.addEventListener("click", function() {
             new Lobby().launch();
         });
-
+    
         resetButton.addEventListener("click", function () {
             $("#saveButton").attr("disabled", true);
             localStorage.clear();
             jsonArray = null;
-            let newGameBoard = new tactics().resetMap(gameboard, contextContainer, jsonArray);
-            new tactics().resetShips(newGameBoard);
+            let newGameBoard = resetMap(gameboard, mainContainer, jsonArray);
+            this.resetShips(newGameBoard);
         });
-
-        this.createShipsContainer(contextContainer); 
-        
-        
-        if(localStorage.getItem("map") == null) {
-            this.resetShips(gameboard);
-        }
-    };
+    
+        this.createShipsContainer(mainContainer);
+    
     }
-
-    resetMap(gameboard, contextContainer, jsonArray) {
-
-        contextContainer.removeChild(document.querySelector(".game-board"));
-
+    resetMap(gameboard, mainContainer, jsonArray) {
+        
+        mainContainer.removeChild(document.querySelector(".game-board"));
+    
         let newGameBoard = new GameBoard();
         let newMap = newGameBoard.getPlayerGameBoard(jsonArray);
-
-        contextContainer.appendChild(newMap);
-
+    
+        mainContainer.appendChild(newMap);
+    
         let container = document.querySelector("#shipsContainer");
         container.remove();
-
-        this.createShipsContainer(contextContainer);
-
+    
+        this.createShipsContainer(mainContainer);
+    
         return newGameBoard;
     }
-
-    createShipsContainer(contextContainer) {
-
+    
+    createShipsContainer(mainContainer) {
+    
+        let container = document.createElement("div");
+        container.setAttribute("id", "myContainer");
+    
         let shipsContainer = document.createElement("div");
         shipsContainer.setAttribute("id", "shipsContainer");
-
-        shipsContainer.textContent = "Your ships";
-
-        contextContainer.appendChild(shipsContainer);
+    
+        let title = document.createElement("div");
+        title.setAttribute("id", "header");
+        title.textContent = "Your ships";
+    
+        shipsContainer.appendChild(title);
+        
+        mainContainer.appendChild(shipsContainer);
     }
-
-
+    
+    
     resetShips(map) {
-
-        let ships = [];
+    
         [1, 1, 1, 1, 2, 2, 2, 3, 3, 4].forEach(element => {
             let ship = new Ship(element, map);
-            ships.push(ship);
-            ship.resetShip(ships);
+            ship.resetShip();
         });
         document.getElementById("resetButton").setAttribute("disabled", true);
     }
+
 }

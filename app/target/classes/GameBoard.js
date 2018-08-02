@@ -1,12 +1,11 @@
 "use strict";
 
 import { Square } from "./Square.js";
-import { Ship } from "./ship.js"
+
 export class GameBoard {
     constructor(isPlayer = true) {
         this.gameBoard = [];
         this.isPlayer = isPlayer;
-        this.isPlayerMove = true;
         this.loadSquares();
         this.getBoard = function () {
             return this.gameBoard;
@@ -19,89 +18,10 @@ export class GameBoard {
                 let square = new Square();
                 square.xPos = xPos;
                 square.yPos = yPos;
+                square.loadDiv();
                 this.gameBoard.push(square);
             }
         }
-    }
-
-    getGameBoard(gameBoardUpdater, container) {
-        if (this.isPlayer) {
-            return this.getPlayerGameBoard(gameBoardUpdater);
-        } else {
-            return this.getEnemyGameBoard(gameBoardUpdater, container);
-        }
-    }
-
-
-    getGameBoardDiv() {
-        let gameBoard = document.createElement("div");
-        gameBoard.setAttribute("class", "game-board");
-        for (let square of this.gameBoard) {
-            square.loadDiv();
-            let htmlSquare = square.getHTMLSquare();
-            gameBoard.appendChild(htmlSquare);
-        }
-        return gameBoard;
-    }
-
-    getPlayerGameBoard(gameBoardUpdater) {
-        let json = JSON.parse(localStorage.getItem("map"));
-        this.gameBoard = this.readSquaresFromArray(json.gameBoard);
-        let gameBoard = this.getGameBoardDiv();
-    
-        for (let i = 0; i < this.gameBoard.length; i++) {
-            let square = this.gameBoard[i];
-            if (square.isShip) {
-                square.div.style.backgroundColor = "black";
-            }
-        }
-        gameBoard.style.border = "2px solid black"; 
-        return gameBoard;
-    }
-
-    getEnemyGameBoard(gameBoardUpdater, container) {
-        let enemyMap = localStorage.getItem("enemyMap");
-        let json = JSON.parse(enemyMap);
-        this.gameBoard = this.readSquaresFromArray(json.gameBoard);
-        let gameBoard = this.getGameBoardDiv();
-        
-        console.log(enemyMap + " <-- enemy map getEnemyGameBoard()");
-        
-        for (let i = 0; i < this.gameBoard.length; i++) {
-            console.log(this.gameBoard.length + "lenght");
-            let square = this.gameBoard[i];
-            this.setEnemyGameBoardColorAddEvent(square, gameBoardUpdater, container);
-        }
-
-        gameBoard.style.border = "2px solid black";
-        return gameBoard;
-    }
-
-    setEnemyGameBoardColorAddEvent(square, gameBoardUpdater, container) {
-        let htmlSquare = square.getHTMLSquare();
-        htmlSquare.style.backgroundColor = "cyan";
-        let onClick = (e) => {
-            if (this.isPlayerMove) {
-                if (square.isShip) {
-                    this.changeSquareToHit(square);
-                    this.changeCornerSquaresToMiss(square);
-                } else {
-                    this.changeSquareToMiss(square);
-                    this.isPlayerMove = false;
-                }
-                if (square.isHit | square.isMiss) {
-                    htmlSquare.removeEventListener("click", onClick);
-                }
-                gameBoardUpdater.postJSONToServer(gameBoardUpdater.parseGameBoardContainerToJSON(container));
-            }
-        };
-        htmlSquare.addEventListener("click", onClick);
-
-        htmlSquare.addEventListener("mouseover", () => {
-            if (square.isHit | square.isMiss) {
-                htmlSquare.removeEventListener("click", onClick);
-            }
-        });
     }
 
     getSquare(xPos, yPos) {
@@ -113,17 +33,92 @@ export class GameBoard {
         }
     }
 
-    readSquaresFromArray(array) { 
-        let gameBoard = []; 
-        for (let i = 0; i < array.length; i++) { 
-            let square = new Square(); 
-            square.xPos = array[i].xPos; 
-            square.yPos = array[i].yPos; 
-            square.isShip = array[i].isShip; 
-            square.loadDiv(); 
-            gameBoard.push(square); 
-        } 
-        return gameBoard; 
+    getGameBoard() {
+        if (this.isPlayer) {
+            return this.getPlayerGameBoard();
+        } else {
+            return this.getEnemyGameBoard();
+        }
+    }
+
+
+    getGameBoardDiv() {
+        let gameBoard = document.createElement("div");
+        gameBoard.setAttribute("class", "game-board");
+        for (let square of this.gameBoard) {
+            let htmlSquare = square.getHTMLSquare();
+            gameBoard.appendChild(htmlSquare);
+        }
+        return gameBoard;
+    }
+
+    getPlayerGameBoard(jsonArray) {
+
+        if (jsonArray != null && jsonArray.gameBoard != null) {
+            this.gameBoard = this.readSquaresFromArray(jsonArray.gameBoard);
+        }
+
+        let board = this.getGameBoardDiv();
+
+        for (let i = 0; i < this.gameBoard.length; i++) {
+            let square = this.gameBoard[i];
+            square.isShip = this.gameBoard[i].isShip;
+            if (square.isShip) {
+                square.div.style.backgroundColor = "black";
+            }
+        }
+        board.style.border = "2px solid black";
+        return board;
+    }
+
+    readSquaresFromArray(array) {
+        let gameBoard = [];
+ 
+        for (let i = 0; i < array.length; i++) {
+
+            let square = new Square();
+            square.xPos = array[i].xPos;
+            square.yPos = array[i].yPos;
+            square.isShip = array[i].isShip;
+            square.loadDiv();
+
+            gameBoard.push(square);
+        }
+        return gameBoard;
+    }
+
+    getEnemyGameBoard() {
+        let gameBoard = this.getGameBoardDiv();
+
+        for (let i = 0; i < this.gameBoard.length; i++) {
+            let square = this.gameBoard[i];
+            if (i % 2 === 0) {
+                square.isShip = true;
+            }
+            this.setEnemyGameBoardColorAddEvent(square);
+        }
+        gameBoard.style.border = "2px solid black";
+        return gameBoard;
+    }
+
+    setEnemyGameBoardColorAddEvent(square) {
+        let htmlSquare = square.div;
+        htmlSquare.style.backgroundColor = "cyan";
+        let onClick = (e) => {
+            console.log(`Width: ${htmlSquare.offsetWidth} Height: ${htmlSquare.offsetHeight}`);
+            console.log(`xPos: ${square.xPos} yPos: ${square.yPos}`);
+
+            if (square.isShip) {
+                this.changeSquareToHit(square);
+                this.changeCornerSquaresToMiss(square);
+            } else {
+                this.changeSquareToMiss(square);
+            }
+            if (square.isHit | square.isMiss) {
+                htmlSquare.removeEventListener("click", onClick);
+            }
+        };
+        htmlSquare.addEventListener("click", onClick);
     }
 
     changeCornerSquaresToMiss(square) {
@@ -146,7 +141,7 @@ export class GameBoard {
     }
 
     changeContainerSize(gameBoardsContainer, squareContainer, browserZoomLevel) {
-        if (browserZoomLevel > 100) {  
+        if (browserZoomLevel > 100) {
             squareContainer.style.width = `${gameBoardsContainer.offsetWidth * 0.4}px`;
             squareContainer.style.height = `${gameBoardsContainer.offsetHeight * 0.6}px`;
         } else {
@@ -159,7 +154,7 @@ export class GameBoard {
         let browserZoomLevel = Math.round(window.devicePixelRatio * 100);
         let gameBoardsContainer = document.getElementsByClassName("game-boards-container")[0];
         let squareContainers = document.getElementsByClassName("game-board");
-    
+
         for (let i = 0; i < gameBoards.length; i++) {
             let squareContainer = squareContainers[i];
             let gameBoard = gameBoards[i];

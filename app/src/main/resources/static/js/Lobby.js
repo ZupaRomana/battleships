@@ -1,6 +1,8 @@
 "use strict";
 
 import {tactics} from "./tactics.js";
+import {gameBoard} from "./main.js";
+import { GameBoardUpdater } from "./GameBoardUpdater.js";
 var onlinePlayers = 0;
 
 const INDEX_ROOM_ID = 1;
@@ -20,6 +22,8 @@ export class Lobby {
 
 function constructBody() {
 
+    const gameBoardUpdater = new GameBoardUpdater();
+
     const mainDiv = document.querySelector('#main-container');
 
     mainDiv.innerHTML = "";
@@ -38,9 +42,16 @@ function constructBody() {
     lobbyHeader.appendChild(lobbyHeaderPlayersCount);
 
     const lobbyHeaderYourTacticsButton = document.createElement('button');
+    lobbyHeaderYourTacticsButton.textContent = "Your tactics (nie dziala)";
+
+    lobbyHeaderYourTacticsButton.addEventListener("click", () => {
+        let localMap = localStorage.getItem("map");
+        gameBoardUpdater.postJSONToServer(localMap, true);
+    });
+
     lobbyHeaderYourTacticsButton.textContent = "Your tactics";
 
-    lobbyHeaderYourTacticsButton.addEventListener("click", function() { 
+    lobbyHeaderYourTacticsButton.addEventListener("click", function() {
         new tactics().showTactics()});
     lobbyHeader.appendChild(lobbyHeaderYourTacticsButton);
 
@@ -74,12 +85,16 @@ function sendPostCreateNewRoom() {
     request.send();
     } else { window.alert("Set your tactics"); }
 }
+var counter = 0;
+function redirectToGameRoom(gameBoardUpdater) {
+    // const request = new XMLHttpRequest();
+    // request.open("GET", "/gameBoardUpdater", true);
+    // request.send();
 
-function redirectToGameRoom() {
-    const request = new XMLHttpRequest();
+    //updater.postJSONToServer(localStorage.getItem("map"));
+    gameBoardUpdater.getJSONFromServerInitial();
+    gameBoard();
 
-    request.open("GET", "/gameBoardUpdater", true);
-    request.send();
 }
 
 function fillRooms() {
