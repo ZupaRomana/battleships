@@ -6,6 +6,7 @@ export class GameBoard {
     constructor(isPlayer = true) {
         this.gameBoard = [];
         this.isPlayer = isPlayer;
+        this.isPlayerMove = true;
         this.loadSquares();
         this.getBoard = function () {
             return this.gameBoard;
@@ -25,7 +26,7 @@ export class GameBoard {
 
     getGameBoard(gameBoardUpdater, container) {
         if (this.isPlayer) {
-            return this.getPlayerGameBoard();
+            return this.getPlayerGameBoard(gameBoardUpdater);
         } else {
             return this.getEnemyGameBoard(gameBoardUpdater, container);
         }
@@ -43,7 +44,7 @@ export class GameBoard {
         return gameBoard;
     }
 
-    getPlayerGameBoard() {
+    getPlayerGameBoard(gameBoardUpdater) {
         let json = JSON.parse(localStorage.getItem("map"));
         this.gameBoard = this.readSquaresFromArray(json.gameBoard);
         let gameBoard = this.getGameBoardDiv();
@@ -59,21 +60,25 @@ export class GameBoard {
     }
 
     getEnemyGameBoard(gameBoardUpdater, container) {
+        let enemyMap = localStorage.getItem("enemyMap");
+        let json = JSON.parse(enemyMap);
+        this.gameBoard = this.readSquaresFromArray(json.gameBoard);
         let gameBoard = this.getGameBoardDiv();
         
+        console.log(enemyMap + " <-- enemy map getEnemyGameBoard()");
+        
         for (let i = 0; i < this.gameBoard.length; i++) {
+            console.log(this.gameBoard.length + "lenght");
             let square = this.gameBoard[i];
-            if (i % 2 === 0) {
-                square.isShip = true;
-            } 
             this.setEnemyGameBoardColorAddEvent(square, gameBoardUpdater, container);
         }
+
         gameBoard.style.border = "2px solid black";
         return gameBoard;
     }
 
     setEnemyGameBoardColorAddEvent(square, gameBoardUpdater, container) {
-        let htmlSquare = square.div;
+        let htmlSquare = square.getHTMLSquare();
         htmlSquare.style.backgroundColor = "cyan";
         let onClick = (e) => {
             if (this.isPlayerMove) {
