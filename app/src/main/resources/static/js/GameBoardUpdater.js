@@ -2,7 +2,8 @@
 
 export class GameBoardUpdater {
     constructor() {
-        this.httpExec = new XMLHttpRequest(); 
+        this.httpExec = new XMLHttpRequest();
+        this.isBeginOfGame = true;
     }
 
     parseGameBoardContainerToJSON(gameBoardContainer) {
@@ -14,9 +15,7 @@ export class GameBoardUpdater {
             this.httpExec.open("POST", "/gameBoardUpdater", true);
             this.httpExec.setRequestHeader("Content-Type", "application/json");
             this.httpExec.send(json);
-            console.log(json + "JSON postJSONToServer() normal");
         } else {
-            console.log(json + " JSON postJSONToServer() in else");
             this.httpExec.open("POST", "/gameBoardUpdater?isInit=true", true);
             this.httpExec.setRequestHeader("Content-Type", "application/json");
             this.httpExec.send(json);
@@ -40,21 +39,21 @@ export class GameBoardUpdater {
     }
 
     getJSONFromServerAndUpdateMap(actualGameBoards) {
+        this.isBeginOfGame = false;
         this.httpExec.onreadystatechange = () => {
             if (this.httpExec.readyState == 4 && this.httpExec.status == 200) {
                 this.updatePlayerMap(this.httpExec.responseText, actualGameBoards);
             }
         };
-        this.httpExec.open("GET", "/gameBoardUpdater", true);
+        this.httpExec.open("GET", "/gameBoardUpdater", false);
         this.httpExec.send(null);
-        console.log(this.httpExec.responseText + " respone text");
     }
 
     updatePlayerMap(json, actualGameBoards) {
         let receivedGameBoards = JSON.parse(json).gameBoards;
         let actualGameBoard = this.getActualPlayerGameBoard(actualGameBoards);
         let receivedGameBoard = this.getReceivedPlayerGameBoard(receivedGameBoards);
-        
+        this.changeTurn(actualGameBoard, receivedGameBoard, JSON.parse(json).gameBoardUpdater);
         for (let i = 0; i < actualGameBoard.gameBoard.length; i++) {
             let actualSquare = actualGameBoard.gameBoard[i];
             let receivedSquare = receivedGameBoard.gameBoard[i];
@@ -64,6 +63,23 @@ export class GameBoardUpdater {
                 actualSquare.updateDivColor();
             }
         }
+    }
+
+    changeTurn(actualGameBoard, receivedGameBoard, receivedUpdater) {
+
+    
+        console.log("Received: ");
+        console.log(receivedGameBoard);
+        console.log(!receivedGameBoard.isPlayerMove + " - " + this.isTurnChange + " - " + receivedUpdater.isTurnChange);
+        if (!receivedGameBoard.isPlayerMove && receivedUpdater.isTurnChange) {
+            actualGameBoard.isPlayerMove = true;
+            this.isTurnChange = false;
+        } else {
+            actualGameBoard.isPlayerMove = false;
+            this.isTurnChange = false;
+        }
+        console.log("ACTUAL: ");
+        console.log(actualGameBoard);
     }
     
     getActualPlayerGameBoard(actualGameBoards) {
