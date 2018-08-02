@@ -65,9 +65,11 @@ export class GameBoardUpdater {
     checkAndChangeSquareState(receivedSquare, actualSquare) {
         if (receivedSquare.isHit !== actualSquare.isHit) {
             actualSquare.isHit = receivedSquare.isHit;
-        } else if (receivedSquare.isMiss !== actualSquare.isMiss) {
+        } 
+        if (receivedSquare.isMiss !== actualSquare.isMiss) {
             actualSquare.isMiss = receivedSquare.isMiss;
-        } else if (receivedSquare.isShip !== actualSquare.isShip) {
+        }
+        if (receivedSquare.isShip !== actualSquare.isShip) {
             actualSquare.isShip = receivedSquare.isShip;
         }
     }
