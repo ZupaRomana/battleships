@@ -7,7 +7,6 @@
     justify-content: space-around;
     align-items: center;
     margin: auto;
-    position: absolute;
     top:0;
     bottom: 0;
     left: 0;
@@ -16,7 +15,7 @@
 
 .game-board {
     width: 40%;
-    height: 60%;
+    height: 80%;
     background-color: transparent;
     display: flex;
     flex-wrap: wrap;
@@ -30,8 +29,8 @@
     justify-content: center;
     align-items: center;
     border: 1px solid black;
-    width: 9%;
-    height: 9%;
+    width: 45px;
+    height: 45px;
     margin: 1px;
     font-size: 20px;
     color: black;
@@ -88,8 +87,43 @@ input {
 
 input[type=submit]:hover {
     cursor: pointer;
-} 
+}
 
 input:hover {
     background-color: #E3E3E3;
+}
+
+.free-ship {
+    width: auto;
+}
+
+#shipsContainer {
+    height: 13%;
+    margin-top: 1%;
+    width: 100%;
+    background-color: green;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-flow: wrap;
+}
+
+.ship1, .ship2, .ship3, .ship4 {
+    height: 50px;
+    background-color: black;
+}
+.ship1 {
+    width: 49px;
+}
+
+.ship2 {
+    width: 102px;
+}
+
+.ship3 {
+    width: 153px;
+}
+
+.ship4 {
+    width: 204px;
 }
