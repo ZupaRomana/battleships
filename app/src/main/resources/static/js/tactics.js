@@ -46,7 +46,13 @@ export class tactics {
             new tactics().resetShips(newGameBoard);
         });
 
-        this.createShipsContainer(contextContainer); };
+        this.createShipsContainer(contextContainer); 
+        
+        
+        if(localStorage.getItem("map") == null) {
+            this.resetShips(gameboard);
+        }
+    };
     }
 
     resetMap(gameboard, contextContainer, jsonArray) {
