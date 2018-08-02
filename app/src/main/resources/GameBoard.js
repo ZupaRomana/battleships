@@ -7,7 +7,7 @@ export class GameBoard {
         this.gameBoard = [];
         this.isPlayer = isPlayer;
         this.loadSquares();
-        this.getBoard = function() {
+        this.getBoard = function () {
             return this.gameBoard;
         };
     }
@@ -52,27 +52,49 @@ export class GameBoard {
         return gameBoard;
     }
 
-    getPlayerGameBoard() {
-        let gameBoard = this.getGameBoardDiv();
-    
+    getPlayerGameBoard(jsonArray) {
+
+        if (jsonArray != null && jsonArray.gameBoard != null) {
+            this.gameBoard = this.readSquaresFromArray(jsonArray.gameBoard);
+        }
+
+        let board = this.getGameBoardDiv();
+
         for (let i = 0; i < this.gameBoard.length; i++) {
             let square = this.gameBoard[i];
+            square.isShip = this.gameBoard[i].isShip;
             if (square.isShip) {
                 square.div.style.backgroundColor = "black";
             }
         }
-        gameBoard.style.border = "2px solid black"; 
+        board.style.border = "2px solid black";
+        return board;
+    }
+
+    readSquaresFromArray(array) {
+        let gameBoard = [];
+ 
+        for (let i = 0; i < array.length; i++) {
+
+            let square = new Square();
+            square.xPos = array[i].xPos;
+            square.yPos = array[i].yPos;
+            square.isShip = array[i].isShip;
+            square.loadDiv();
+
+            gameBoard.push(square);
+        }
         return gameBoard;
     }
 
     getEnemyGameBoard() {
         let gameBoard = this.getGameBoardDiv();
-        
+
         for (let i = 0; i < this.gameBoard.length; i++) {
             let square = this.gameBoard[i];
             if (i % 2 === 0) {
                 square.isShip = true;
-            } 
+            }
             this.setEnemyGameBoardColorAddEvent(square);
         }
         gameBoard.style.border = "2px solid black";
@@ -119,7 +141,7 @@ export class GameBoard {
     }
 
     changeContainerSize(gameBoardsContainer, squareContainer, browserZoomLevel) {
-        if (browserZoomLevel > 100) {  
+        if (browserZoomLevel > 100) {
             squareContainer.style.width = `${gameBoardsContainer.offsetWidth * 0.4}px`;
             squareContainer.style.height = `${gameBoardsContainer.offsetHeight * 0.6}px`;
         } else {
@@ -132,7 +154,7 @@ export class GameBoard {
         let browserZoomLevel = Math.round(window.devicePixelRatio * 100);
         let gameBoardsContainer = document.getElementsByClassName("game-boards-container")[0];
         let squareContainers = document.getElementsByClassName("game-board");
-    
+
         for (let i = 0; i < gameBoards.length; i++) {
             let squareContainer = squareContainers[i];
             let gameBoard = gameBoards[i];
