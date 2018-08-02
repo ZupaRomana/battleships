@@ -1,6 +1,6 @@
 "use strict";
 import {gameBoard} from "./main.js";
-
+import { GameBoardUpdater } from "./GameBoardUpdater.js";
 var onlinePlayers = 0;
 
 export class Lobby {
@@ -13,6 +13,8 @@ export class Lobby {
 }
 
 function constructBody() {
+
+    const gameBoardUpdater = new GameBoardUpdater();
 
     const mainDiv = document.querySelector('#main-container');
 
@@ -33,6 +35,12 @@ function constructBody() {
 
     const lobbyHeaderYourTacticsButton = document.createElement('button');
     lobbyHeaderYourTacticsButton.textContent = "Your tactics (nie dziala)";
+    
+    lobbyHeaderYourTacticsButton.addEventListener("click", () => {
+        let localMap = localStorage.getItem("map");
+        gameBoardUpdater.postJSONToServer(localMap, true);
+    });
+
     lobbyHeader.appendChild(lobbyHeaderYourTacticsButton);
 
     const lobbyInfo = document.createElement('div');
@@ -48,16 +56,21 @@ function constructBody() {
     room2.setAttribute('class', 'room');
     room2.addEventListener('click', () => {
         console.log("ok");
-        redirectToGameRoom();
+        
+        redirectToGameRoom(gameBoardUpdater);
     })
     lobbyRoomsContainer.appendChild(room2);
 }
-
-function redirectToGameRoom() {
-    const request = new XMLHttpRequest();
-    request.open("GET", "/gameBoardUpdater", true);
-    request.send();
+var counter = 0;
+function redirectToGameRoom(gameBoardUpdater) {
+    // const request = new XMLHttpRequest();
+    // request.open("GET", "/gameBoardUpdater", true);
+    // request.send();
+    
+    //updater.postJSONToServer(localStorage.getItem("map"));
+    gameBoardUpdater.getJSONFromServerInitial();
     gameBoard();
+    
 }
 
 function fillRooms() {
