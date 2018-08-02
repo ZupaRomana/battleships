@@ -6,10 +6,10 @@ import java.util.Map;
 public class AccountContainer {
 
     private static AccountContainer instance;
-    private Map<String, String> sessionIdNickname;
+    private Map<String, String> sessionIdNickNames;
 
     private AccountContainer() {
-        sessionIdNickname = new HashMap<>();
+        sessionIdNickNames = new HashMap<>();
     }
 
     public static AccountContainer getInstance() {
@@ -21,29 +21,37 @@ public class AccountContainer {
     }
 
     public void add(String sessionId, String nickName) {
-        sessionIdNickname.put(sessionId, nickName);
+        sessionIdNickNames.put(sessionId, nickName);
     }
 
     public String get(String sessionId) {
-        return sessionIdNickname.get(sessionId);
+        return sessionIdNickNames.get(sessionId);
     }
 
     public boolean contains(String sessionId) {
-        return sessionIdNickname.containsKey(sessionId);
+        return sessionIdNickNames.containsKey(sessionId);
     }
 
     public void remove(int sessionId) {
-        for (String session : sessionIdNickname.keySet()) {
-            if (sessionIdNickname.get(session).equals(sessionId)) {
-                sessionIdNickname.remove(session);
+        for (String session : sessionIdNickNames.keySet()) {
+            if (sessionIdNickNames.get(session).equals(sessionId)) {
+                sessionIdNickNames.remove(session);
             }
         }
     }
 
     public void clear() {
-        sessionIdNickname.clear();
+        sessionIdNickNames.clear();
     }
 
-    public int getSize() { return sessionIdNickname.keySet().size();}
+    public int getSize() { return sessionIdNickNames.keySet().size();}
+
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String s : sessionIdNickNames.keySet()) {
+            stringBuilder.append("Session: ").append(s).append(" Nickname: ").append(sessionIdNickNames.get(s));
+        }
+        return stringBuilder.toString();
+    }
 
 }

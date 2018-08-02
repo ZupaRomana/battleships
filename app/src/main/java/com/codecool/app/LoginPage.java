@@ -1,9 +1,11 @@
 package com.codecool.app;
 
 import com.codecool.app.helpers.AccountContainer;
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.*;
 import java.net.HttpCookie;
@@ -28,7 +30,7 @@ public class LoginPage implements HttpHandler {
         if (isGetMethod()) {
             prepareResponse();
         } else {
-            catchData();
+            prepareResponsePost();
         }
         sendResponse();
     }
@@ -47,7 +49,6 @@ public class LoginPage implements HttpHandler {
                 buildIndexHtml();
                 break;
             case "count":
-                manageCookies();
                 buildJSON();
                 break;
             default:
@@ -55,39 +56,52 @@ public class LoginPage implements HttpHandler {
         }
     }
 
-    private void manageCookies()
+    private void prepareResponsePost() throws IOException
     {
+        String data = getDataFromURI();
 
-        System.out.println(counter);
-//        if (counter >= 10) {
-            AccountContainer.getInstance().clear();
-            List<String> cookiesss = httpExchange.getRequestHeaders().get("Cookie");
-            String[] eee = cookiesss.get(0).split(";");
-            List<String> cookies = new ArrayList<String>(Arrays.asList(eee));
+        switch (data){
+            case "index":
+                catchData();
+                break;
+            case "createNewRoom":
+                createNewGameRoom();
+                redirect("gameBoardUpdater");
+                break;
+            default:
+                buildIndexHtml();
+        }
+    }
 
-            String session = null;
-            String nick = null;
+    private void createNewGameRoom()
+    {
+        String cookie = httpExchange.getRequestHeaders().getFirst("Cookie");
+        HttpCookie httpCookie = HttpCookie.parse(cookie).get(0);
+        String sessionId = httpCookie.toString().split("=")[1];
 
-            if (cookies.size() == 2) {
-                HttpCookie sessionId = HttpCookie.parse(cookies.get(0)).get(0);
-                HttpCookie nickName = HttpCookie.parse(cookies.get(1)).get(0);
-                session = sessionId.toString().split("=")[1];
-                nick = nickName.toString().split("=")[1];
-            }
+        String playerName = AccountContainer.getInstance().get(sessionId);
 
-            if (session != null && nickNames.contains(nick)) {
-                AccountContainer.getInstance().add(session, nick);
-            }
+        GameRoom gameRoom = new GameRoom(sessionId, playerName);
+        GameRoomsContainer grc = GameRoomsContainer.getInstance();
+        grc.add(gameRoom);
+        System.out.println(GameRoomsContainer.getInstance());
+    }
 
-//            counter = 0;
-//        }
-        counter++;
+    private void redirect(String location) throws IOException
+    {
+        Headers headers = httpExchange.getResponseHeaders();
+        headers.add("Location", location);
+        httpExchange.sendResponseHeaders(302, -1);
+        httpExchange.close();
     }
 
     private void buildJSON()
     {
         JSONArray jsonArray = new JSONArray();
+
         jsonArray.put(AccountContainer.getInstance().getSize());
+        jsonArray.put(GameRoomsContainer.getInstance());
+
         response = jsonArray.toString();
     }
 
@@ -119,6 +133,7 @@ public class LoginPage implements HttpHandler {
     private void catchData() throws IOException {
 
         Map<String, String> keyValue = getInputs();
+        System.out.println(keyValue);
         AccountContainer accountContainer = AccountContainer.getInstance();
 
         String uuid = UUID.randomUUID().toString();
@@ -130,10 +145,10 @@ public class LoginPage implements HttpHandler {
         nickNames.add(nickName);
 
         HttpCookie httpCookie = new HttpCookie("sessionId", uuid);
-        HttpCookie cookieNick = new HttpCookie("nickName", nickName);
+//        HttpCookie cookieNick = new HttpCookie("nickName", nickName);
 
         httpExchange.getResponseHeaders().add("Set-Cookie", httpCookie.toString());
-        httpExchange.getResponseHeaders().add("Set-Cookie", cookieNick.toString());
+//        httpExchange.getResponseHeaders().add("Set-Cookie", cookieNick.toString());
     }
 
     private static Map<String, String> parseFormData(String formData)
