@@ -30,7 +30,7 @@ public class GameBoardUpdater implements HttpHandler {
         HttpCookie cookie = HttpCookie.parse(cookieStr).get(0);
 
         URI uri = httpExchange.getRequestURI();
-        System.out.println(uri.toString());
+        System.out.println("\n"+uri.toString());
         System.out.println(method + " - " + cookieStr);
         if (method.equals("POST")) {
             lastPostSessionId = cookie.getValue();
