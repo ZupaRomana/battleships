@@ -76,19 +76,19 @@ export class GameBoard {
         let htmlSquare = square.div;
         htmlSquare.style.backgroundColor = "cyan";
         let onClick = (e) => {
-            console.log(`Width: ${htmlSquare.offsetWidth} Height: ${htmlSquare.offsetHeight}`);
-            console.log(`xPos: ${square.xPos} yPos: ${square.yPos}`);
-
-            if (square.isShip) {
-                this.changeSquareToHit(square);
-                this.changeCornerSquaresToMiss(square);
-            } else {
-                this.changeSquareToMiss(square);
+            if (this.isPlayerMove) {
+                if (square.isShip) {
+                    this.changeSquareToHit(square);
+                    this.changeCornerSquaresToMiss(square);
+                } else {
+                    this.changeSquareToMiss(square);
+                    this.isPlayerMove = false;
+                }
+                if (square.isHit | square.isMiss) {
+                    htmlSquare.removeEventListener("click", onClick);
+                }
+                gameBoardUpdater.postJSONToServer(gameBoardUpdater.parseGameBoardContainerToJSON(container));
             }
-            if (square.isHit | square.isMiss) {
-                htmlSquare.removeEventListener("click", onClick);
-            }
-            gameBoardUpdater.postJSONToServer(gameBoardUpdater.parseGameBoardContainerToJSON(container));
         };
         htmlSquare.addEventListener("click", onClick);
 
