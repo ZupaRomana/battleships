@@ -36,6 +36,7 @@ export class GameBoard {
         let gameBoard = document.createElement("div");
         gameBoard.setAttribute("class", "game-board");
         for (let square of this.gameBoard) {
+            square.loadDiv();
             let htmlSquare = square.getHTMLSquare();
             gameBoard.appendChild(htmlSquare);
         }
@@ -43,7 +44,8 @@ export class GameBoard {
     }
 
     getPlayerGameBoard() {
-        let localStorageMap = localStorage.getItem("map");
+        let json = JSON.parse(localStorage.getItem("map"));
+        this.gameBoard = this.readSquaresFromArray(json.gameBoard);
         let gameBoard = this.getGameBoardDiv();
     
         for (let i = 0; i < this.gameBoard.length; i++) {
@@ -104,6 +106,19 @@ export class GameBoard {
                 return square;
             }
         }
+    }
+
+    readSquaresFromArray(array) { 
+        let gameBoard = []; 
+        for (let i = 0; i < array.length; i++) { 
+            let square = new Square(); 
+            square.xPos = array[i].xPos; 
+            square.yPos = array[i].yPos; 
+            square.isShip = array[i].isShip; 
+            square.loadDiv(); 
+            gameBoard.push(square); 
+        } 
+        return gameBoard; 
     }
 
     changeCornerSquaresToMiss(square) {
