@@ -9,10 +9,34 @@ export class GameBoardUpdater {
         return JSON.stringify(gameBoardContainer);
     }
 
-    postJSONToServer(json) {
-        this.httpExec.open("POST", "/gameBoardUpdater", true);
-        this.httpExec.setRequestHeader("Content-Type", "application/json");
-        this.httpExec.send(json);
+    postJSONToServer(json, isBeginOfGame = false) {
+        if (!isBeginOfGame) {
+            this.httpExec.open("POST", "/gameBoardUpdater", true);
+            this.httpExec.setRequestHeader("Content-Type", "application/json");
+            this.httpExec.send(json);
+            console.log(json + "JSON postJSONToServer() normal");
+        } else {
+            console.log(json + " JSON postJSONToServer() in else");
+            this.httpExec.open("POST", "/gameBoardUpdater?isInit=true", true);
+            this.httpExec.setRequestHeader("Content-Type", "application/json");
+            this.httpExec.send(json);
+        }
+    }
+
+    getJSONFromServerInitial() {
+        let json;
+        this.httpExec.onreadystatechange = () => {
+            if (this.httpExec.readyState == 4 && this.httpExec.status == 200) {
+                json = this.httpExec.responseText;
+                if (json) {
+                    localStorage.setItem("enemyMap", json);
+                } else {
+                    console.log("cannot load resources");
+                }
+            }
+        };
+        this.httpExec.open("GET", "/gameBoardUpdater", false);
+        this.httpExec.send(null);
     }
 
     getJSONFromServerAndUpdateMap(actualGameBoards) {
@@ -23,7 +47,20 @@ export class GameBoardUpdater {
         };
         this.httpExec.open("GET", "/gameBoardUpdater", true);
         this.httpExec.send(null);
-        console.log(this.httpExec.responseText);
+        console.log(this.httpExec.responseText + " respone text");
+    }
+
+    getEnemyMap() {
+        let map;
+        this.httpExec.onreadystatechange = () => {
+            if (this.httpExec.readyState == 4 && this.httpExec.status == 200) {
+                map = this.httpExec.responseText;
+            }
+        };
+        this.httpExec.open("GET", "/gameBoardUpdater", true);
+        this.httpExec.send(null);
+        console.log(map + " map");
+        return map;
     }
 
     parseJSONToObject(json) {
