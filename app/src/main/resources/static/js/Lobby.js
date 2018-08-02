@@ -54,6 +54,7 @@ function constructBody() {
     createNewRoomButton.innerHTML = "Create new room";
     createNewRoomButton.addEventListener('click', () => {
         sendPostCreateNewRoom();
+        redirectToGameRoom();
     })
     lobby.appendChild(createNewRoomButton);
 
@@ -133,6 +134,9 @@ function buildRooms(array) {
                     let joinButton = document.createElement("button");
                     joinButton.setAttribute("id", "join-button");
                     joinButton.textContent = "JOIN";
+                    joinButton.addEventListener('click', () => {
+                        redirectToGameRoom();
+                    })
                     roomDiv.appendChild(joinButton);
                 }
 
