@@ -51,7 +51,7 @@ export class GameBoardUpdater {
     }
 
     updatePlayerMap(json, actualGameBoards) {
-        let receivedGameBoards = this.parseJSONToObject(json).gameBoards;
+        let receivedGameBoards = JSON.parse(json).gameBoards;
         let actualGameBoard = this.getActualPlayerGameBoard(actualGameBoards);
         let receivedGameBoard = this.getReceivedPlayerGameBoard(receivedGameBoards);
         
