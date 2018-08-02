@@ -1,5 +1,6 @@
 package com.codecool.app;
 
+import com.codecool.app.helpers.AccountContainer;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -7,29 +8,55 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpCookie;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class GameBoardUpdater implements HttpHandler {
 
+    private Map<String, String> tacticsMap = new TreeMap<>();
     private String gameState;
     private String lastPostSessionId;
     private String lastGetSessionId;
+    private boolean isInit;
 
     @Override
     public void handle(HttpExchange httpExchange) {
 
         String cookieStr = httpExchange.getRequestHeaders().getFirst("Cookie");
         String method = httpExchange.getRequestMethod();
-        HttpCookie cookie = cookie = HttpCookie.parse(cookieStr).get(0);
+        HttpCookie cookie = HttpCookie.parse(cookieStr).get(0);
 
+        URI uri = httpExchange.getRequestURI();
+        System.out.println(uri.toString());
         System.out.println(method + " - " + cookieStr);
         if (method.equals("POST")) {
-            getGameState(httpExchange);
             lastPostSessionId = cookie.getValue();
+            if (lastPostSessionId != null) {
+                if (uri.toString().contains("isInit=true") && !tacticsMap.containsKey(lastPostSessionId)) {
+                    getGameState(httpExchange);
+                    tacticsMap.put(lastPostSessionId, gameState);
+                    System.out.println(tacticsMap.keySet() + " - " + tacticsMap.get(lastPostSessionId));
+                    isInit = true;
+                } else {
+                    getGameState(httpExchange);
+                }
+            }
         } else if (method.equals("GET")) {
             lastGetSessionId = cookie.getValue();
+            if (isInit) {
+                for (String key: tacticsMap.keySet()) {
+                   if (key != lastGetSessionId && key != null) {
+                       gameState = tacticsMap.get(key);
+                        isInit = false;
+                   }
+                }
+            }
             System.out.println(lastPostSessionId + " <- POST GET - >" + lastGetSessionId);
+            System.out.println("Game state: " + gameState);
+            System.out.println("MAP->> "+tacticsMap.keySet() + " - " + tacticsMap.get(lastPostSessionId));
             sendGameState(httpExchange);
         }
     }
@@ -61,15 +88,20 @@ public class GameBoardUpdater implements HttpHandler {
 
     public void sendGameState(HttpExchange httpExchange) {
         OutputStream os = httpExchange.getResponseBody();
-        if (!lastGetSessionId.equals(lastPostSessionId)) {
-            try {
-                httpExchange.getResponseHeaders().set("Content-Type", "application/json");
+        try {
+            httpExchange.getResponseHeaders().set("Content-Type", "application/json");
+            if (!lastGetSessionId.equals(lastPostSessionId) && lastPostSessionId != null) {
                 httpExchange.sendResponseHeaders(200, gameState.length());
                 os.write(gameState.getBytes());
                 os.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("Game state: " + gameState + " SENDED");
+            } else {
+                httpExchange.sendResponseHeaders(404, "Bad entry!".length());
+                os.write("Bad entry!".getBytes());
+                os.close();
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
