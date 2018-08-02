@@ -65,8 +65,6 @@ export class GameBoard {
         this.gameBoard = this.readSquaresFromArray(json.gameBoard);
         let gameBoard = this.getGameBoardDiv();
         
-        console.log(enemyMap + " <-- enemy map getEnemyGameBoard()");
-        
         for (let i = 0; i < this.gameBoard.length; i++) {
             console.log(this.gameBoard.length + "lenght");
             let square = this.gameBoard[i];
@@ -88,11 +86,13 @@ export class GameBoard {
                 } else {
                     this.changeSquareToMiss(square);
                     this.isPlayerMove = false;
+                    gameBoardUpdater.isTurnChange = true;
                 }
                 if (square.isHit | square.isMiss) {
                     htmlSquare.removeEventListener("click", onClick);
                 }
                 gameBoardUpdater.postJSONToServer(gameBoardUpdater.parseGameBoardContainerToJSON(container));
+                gameBoardUpdater.isBeginOfGame = false;
             }
         };
         htmlSquare.addEventListener("click", onClick);
@@ -169,6 +169,4 @@ export class GameBoard {
             }
         }
     }
-
-
 }
