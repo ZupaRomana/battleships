@@ -19,7 +19,7 @@ public class App {
         httpServer.createContext("/index", new LoginPage());
         httpServer.createContext("/static", new Static());
         httpServer.createContext("/gameBoardUpdater", new GameBoardUpdater());
-//        httpServer.createContext("/", new SomeClass());
+        httpServer.createContext("/lobbyController", new LobbyController());
 
         httpServer.setExecutor(null);
 
