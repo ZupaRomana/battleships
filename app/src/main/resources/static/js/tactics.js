@@ -4,12 +4,16 @@ import { GameBoard } from "./GameBoard.js";
 import { Lobby } from "./Lobby.js";
 
 export class tactics {
+    constructor() {
+        console.log("sie utworzyl");
+    }
 
     showTactics() {
         let mainContainer = document.getElementById("main-container");
     
         let resetButton = document.createElement("button");
         resetButton.setAttribute("id", "resetButton");
+        resetButton.setAttribute("disabled", "false");
         resetButton.textContent = "RESET";
     
         let saveButton = document.createElement("button");
@@ -21,18 +25,18 @@ export class tactics {
     
         let gameboard = new GameBoard();
     
-        let map = gameboard.getPlayerGameBoard(jsonArray);
+        let map = gameboard.getTacticGameBoard(jsonArray);
         
         mainContainer.appendChild(resetButton);
         mainContainer.appendChild(saveButton);
         mainContainer.appendChild(map);
-        
+    
         saveButton.addEventListener("click", function() {
             new Lobby().launch();
         });
     
         resetButton.addEventListener("click", function () {
-            $("#saveButton").attr("disabled", true);
+            // $("#saveButton").attr("disabled", true);
             localStorage.clear();
             jsonArray = null;
             let newGameBoard = resetMap(gameboard, mainContainer, jsonArray);
@@ -40,6 +44,9 @@ export class tactics {
         });
     
         this.createShipsContainer(mainContainer);
+        if (!jsonArray) {
+            this.resetShips(gameboard);
+        };
     
     }
     resetMap(gameboard, mainContainer, jsonArray) {
@@ -47,7 +54,7 @@ export class tactics {
         mainContainer.removeChild(document.querySelector(".game-board"));
     
         let newGameBoard = new GameBoard();
-        let newMap = newGameBoard.getPlayerGameBoard(jsonArray);
+        let newMap = newGameBoard.getTacticGameBoard(jsonArray);
     
         mainContainer.appendChild(newMap);
     
