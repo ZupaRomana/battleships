@@ -27,6 +27,17 @@ public class GameRoomsContainer {
         return rooms.get(index);
     }
 
+    public GameRoom get(String sessionId) {
+        for (GameRoom gameRoom: this.rooms) {
+            if (gameRoom.getHostingPlayerSessionId().equals(sessionId) ||
+                gameRoom.getClientPlayerSessionId().equals(sessionId)) {
+
+                return gameRoom;
+            }
+        }
+        return null;
+    }
+
     public void remove(int index) {
         rooms.remove(index);
     }
