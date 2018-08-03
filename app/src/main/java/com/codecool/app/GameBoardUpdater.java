@@ -41,7 +41,7 @@ public class GameBoardUpdater implements HttpHandler {
                 if (uri.toString().contains("isInit=true") && !tacticsMap.containsKey(lastPostSessionId)) {
                     getGameState(httpExchange);
                     tacticsMap.put(lastPostSessionId, gameState);
-                    System.out.println(tacticsMap.keySet() + " - " + tacticsMap.get(lastPostSessionId));
+                    System.out.println(tacticsMap.keySet() + " - Session id: " + sessionID + " - " + tacticsMap.get(lastPostSessionId));
                     isInit = true;
                 } else {
                     getGameState(httpExchange);
