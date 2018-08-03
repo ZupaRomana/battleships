@@ -32,12 +32,24 @@ export class GameBoard {
         }
     }
 
+    getTacticGameBoard(jsonArray) {
+        if (jsonArray) {
+            this.gameBoard = this.readSquaresFromArray(jsonArray);
+            return this.getGameBoardDiv(true);
+        } else {
+            return this.getGameBoardDiv();
+        }
+    }
 
-    getGameBoardDiv() {
+
+    getGameBoardDiv(isTactic = false) {
         let gameBoard = document.createElement("div");
         gameBoard.setAttribute("class", "game-board");
         for (let square of this.gameBoard) {
-            square.loadDiv();
+            
+            if (!isTactic) {
+                square.loadDiv();
+            }
             let htmlSquare = square.getHTMLSquare();
             gameBoard.appendChild(htmlSquare);
         }
@@ -79,6 +91,7 @@ export class GameBoard {
         let htmlSquare = square.getHTMLSquare();
         htmlSquare.style.backgroundColor = "cyan";
         let onClick = (e) => {
+            console.log(this.isPlayerMove + " <- isPlayerMove");
             if (this.isPlayerMove) {
                 if (square.isShip) {
                     this.changeSquareToHit(square);
