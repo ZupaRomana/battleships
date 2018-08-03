@@ -66,10 +66,32 @@ public class LoginPage implements HttpHandler {
                 break;
             case "createNewRoom":
                 createNewGameRoom();
-                redirect("gameBoardUpdater");
+                //redirect("gameBoardUpdater");
+                break;
+            case "enterARoom":
+
+                enterARoom();
                 break;
             default:
                 buildIndexHtml();
+        }
+    }
+
+    private void enterARoom() {
+        System.out.println("enterARoom()");
+        String cookie = httpExchange.getRequestHeaders().getFirst("Cookie");
+        HttpCookie httpCookie = HttpCookie.parse(cookie).get(0);
+        String sessionId = httpCookie.getValue();
+        GameRoomsContainer gameRoomsContainer = GameRoomsContainer.getInstance();
+        InputStream is = httpExchange.getRequestBody();
+        String hostName = getHostName(is);
+        System.out.println(sessionId + " <- Session wich want enter a room| Hostname of room -> " + hostName);
+        for (int i = 0; i < gameRoomsContainer.getAll().size(); i++) {
+            GameRoom gameRoom = gameRoomsContainer.get(i);
+            if (gameRoom.getHostPlayerName().equalsIgnoreCase(hostName) && gameRoom.getClientPlayerName() == null) {
+                gameRoom.setClientPlayerName(AccountContainer.getInstance().get(sessionId));
+                gameRoom.setClientPlayerSessionId(sessionId);
+            }
         }
     }
 
@@ -175,5 +197,28 @@ public class LoginPage implements HttpHandler {
         BufferedReader br = new BufferedReader(isr);
         String formData = br.readLine();
         return parseFormData(formData);
+    }
+
+    private String getHostName(InputStream is) {
+        List<Byte> byteList = getBytesList(is);
+        byte[] bytes = new byte[byteList.size()];
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = byteList.get(i);
+        }
+        String hostName = new String(bytes);
+        return hostName;
+}
+    private List<Byte> getBytesList(InputStream is) {
+        List<Byte> byteList = new ArrayList<>();
+        try {
+            int bytesNumber;
+            while ((bytesNumber = is.read()) != -1) {
+                byteList.add((byte) bytesNumber);
+            }
+            is.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return byteList;
     }
 }
