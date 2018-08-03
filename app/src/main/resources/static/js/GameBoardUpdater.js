@@ -30,11 +30,11 @@ export class GameBoardUpdater {
                 if (json) {
                     localStorage.setItem("enemyMap", json);
                 } else {
-                    console.log("cannot load resources");
+                    console.log("cannot load resources!" + json + " <- JSON");
                 }
             }
         };
-        this.httpExec.open("GET", "/gameBoardUpdater", false);
+        this.httpExec.open("GET", "/gameBoardUpdater", true);
         this.httpExec.send(null);
     }
 
@@ -52,8 +52,9 @@ export class GameBoardUpdater {
     updatePlayerMap(json, actualGameBoards) {
         let receivedGameBoards = JSON.parse(json).gameBoards;
         let actualGameBoard = this.getActualPlayerGameBoard(actualGameBoards);
+        let actualEnemyBoard = this.getActualEnemyBoard(actualGameBoards)
         let receivedGameBoard = this.getReceivedPlayerGameBoard(receivedGameBoards);
-        this.changeTurn(actualGameBoard, receivedGameBoard, JSON.parse(json).gameBoardUpdater);
+        this.changeTurn(actualEnemyBoard, receivedGameBoard, JSON.parse(json).gameBoardUpdater);
         for (let i = 0; i < actualGameBoard.gameBoard.length; i++) {
             let actualSquare = actualGameBoard.gameBoard[i];
             let receivedSquare = receivedGameBoard.gameBoard[i];
@@ -70,13 +71,11 @@ export class GameBoardUpdater {
     
         console.log("Received: ");
         console.log(receivedGameBoard);
-        console.log(!receivedGameBoard.isPlayerMove + " - " + this.isTurnChange + " - " + receivedUpdater.isTurnChange);
-        if (!receivedGameBoard.isPlayerMove && receivedUpdater.isTurnChange) {
+        console.log(!receivedGameBoard.isPlayerMove + " - " + actualGameBoard.isPlayerMove);
+        if (!receivedGameBoard.isPlayerMove) {
             actualGameBoard.isPlayerMove = true;
-            this.isTurnChange = false;
         } else {
             actualGameBoard.isPlayerMove = false;
-            this.isTurnChange = false;
         }
         console.log("ACTUAL: ");
         console.log(actualGameBoard);
@@ -85,6 +84,14 @@ export class GameBoardUpdater {
     getActualPlayerGameBoard(actualGameBoards) {
         for (let gameBoard of actualGameBoards) {
             if (gameBoard.isPlayer) {
+                return gameBoard;
+            }
+        }
+    }
+
+    getActualEnemyBoard(actualGameBoards) {
+        for (let gameBoard of actualGameBoards) {
+            if (!gameBoard.isPlayer) {
                 return gameBoard;
             }
         }
