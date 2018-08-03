@@ -67,7 +67,6 @@ function constructBody(gameBoardUpdater) {
     createNewRoomButton.innerHTML = "Create new room";
     createNewRoomButton.addEventListener('click', () => {
         sendPostCreateNewRoom(gameBoardUpdater);
-        gameBoardUpdater.postJSONToServer(localStorage.getItem("map"), true);
         statucChecker.run();
     })
     lobby.appendChild(createNewRoomButton);
@@ -125,6 +124,10 @@ function fillRooms(gameBoardUpdater) {
 
             let lobbyHeaderPlayersCount = document.querySelector('#counter');
             lobbyHeaderPlayersCount.innerHTML = `Players online: ${onlinePlayers}`;
+            if (this.statusChecker.hasRoomPlayers) {
+                let gameRoom = this.statusChecker.getGameRoom(); 
+                lobbyHeaderPlayersCount.innerHTML = lobbyHeaderPlayersCount + `<br> `; 
+            }
 
             buildRooms(array, gameBoardUpdater, lobbyTimeOut);
         };
