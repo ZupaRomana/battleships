@@ -11,6 +11,7 @@ export class LobbyStatusChecker {
     }   
 
     checkIfPlayersAreInRoom() {
+        console.log(this.httpExec);
         getGameRoom(this.httpExec)
         
     }   
@@ -19,12 +20,17 @@ export class LobbyStatusChecker {
 function getGameRoom(httpExec) {
     httpExec.onreadystatechange = () => {
         if (httpExec.status == 200 & httpExec.readyState == 4) {
-            localStorage.setItem("gameRoom", httpExec.responeText);
-            clearTimeout(getGameRoom)
-            console.log("Get game room!");
+            let json = httpExec.response;
+            if (json) {
+                localStorage.setItem("gameRoom", json);
+                clearTimeout(getRoomTimeout);
+                console.log("Get game room!");
+            } else {
+                console.log("Bad game room download from server!")
+            }
         }
     };
     httpExec.open("GET", "/lobbyController", true);
-    httpExec.send(null);
-    var getRoomTimeout = setTimeout(() => { getGameRoom(httpExec); }, 1000)
+    httpExec.send();
+    var getRoomTimeout = setTimeout(() => { getGameRoom(httpExec); }, 2000);
 }
