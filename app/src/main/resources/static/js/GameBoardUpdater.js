@@ -50,11 +50,14 @@ export class GameBoardUpdater {
     }
 
     updatePlayerMap(json, actualGameBoards) {
+
         let receivedGameBoards = JSON.parse(json).gameBoards;
         let actualGameBoard = this.getActualPlayerGameBoard(actualGameBoards);
         let actualEnemyBoard = this.getActualEnemyBoard(actualGameBoards)
         let receivedGameBoard = this.getReceivedPlayerGameBoard(receivedGameBoards);
+
         this.changeTurn(actualEnemyBoard, receivedGameBoard, JSON.parse(json).gameBoardUpdater);
+
         for (let i = 0; i < actualGameBoard.gameBoard.length; i++) {
             let actualSquare = actualGameBoard.gameBoard[i];
             let receivedSquare = receivedGameBoard.gameBoard[i];
@@ -67,18 +70,11 @@ export class GameBoardUpdater {
     }
 
     changeTurn(actualGameBoard, receivedGameBoard, receivedUpdater) {
-
-    
-        console.log("Received: ");
-        console.log(receivedGameBoard);
-        console.log(!receivedGameBoard.isPlayerMove + " - " + actualGameBoard.isPlayerMove);
         if (!receivedGameBoard.isPlayerMove) {
             actualGameBoard.isPlayerMove = true;
         } else {
             actualGameBoard.isPlayerMove = false;
         }
-        console.log("ACTUAL: ");
-        console.log(actualGameBoard);
     }
     
     getActualPlayerGameBoard(actualGameBoards) {
