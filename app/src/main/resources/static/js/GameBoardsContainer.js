@@ -29,7 +29,6 @@ export class GameBoardsContainer {
                     this.gameBoardUpdater.getJSONFromServerAndUpdateMap(this.gameBoards);
                 } else {
                     this.gameBoardUpdater.isBeginOfGame = true;
-                    console.log("timeout");
                 }
             } catch(err) {
                 console.log(err.message);
@@ -51,3 +50,26 @@ export class GameBoardsContainer {
         }, 3000);
     }
 }
+
+export let startGameBoard = function(gameBoardUpdater, redirectInterval) {
+
+        if (redirectInterval) {
+            clearInterval(redirectInterval);
+        }
+
+        let interval = setInterval(() => {
+            console.log("gameBoard interval");
+            gameBoardUpdater.getJSONFromServerInitial();
+         }, 2000);
+
+        if (localStorage.getItem("enemyMap")) {
+            clearInterval(interval);
+            gameBoardUpdater.postJSONToServer(localStorage.getItem("map"), true);
+            let gameBoardsContainer = new GameBoardsContainer();
+            document.getElementById("main-container").appendChild(gameBoardsContainer.container);
+            gameBoardsContainer.scaleGameBoardToBrowserZoomLevel();
+            document.getElementById("lobby").remove();
+        } else {
+            console.log("reasources not loaded");
+        }
+    }
