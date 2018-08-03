@@ -56,7 +56,7 @@ export class GameBoard {
         return gameBoard;
     }
 
-    getPlayerGameBoard(gameBoardUpdater) {
+    getPlayerGameBoard() {
         let json = JSON.parse(localStorage.getItem("map"));
         this.gameBoard = this.readSquaresFromArray(json.gameBoard);
         let gameBoard = this.getGameBoardDiv();
