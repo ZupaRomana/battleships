@@ -1,7 +1,9 @@
 "use strict";
-import {gameBoard} from "./main.js";
+
+import {startGameBoard} from "./GameBoardsContainer.js";
 import { GameBoardUpdater } from "./GameBoardUpdater.js";
 import { tactics } from "./tactics.js";
+
 var onlinePlayers = 0;
 
 const INDEX_ROOM_ID = 1;
@@ -48,7 +50,9 @@ function constructBody(gameBoardUpdater) {
 
     lobbyHeaderYourTacticsButton.addEventListener("click", function() {
         document.getElementById("lobby").remove();
-        new tactics().showTactics()});
+        new tactics().showTactics();
+    });
+
     lobbyHeader.appendChild(lobbyHeaderYourTacticsButton);
 
     const lobbyInfo = document.createElement('div');
@@ -63,7 +67,7 @@ function constructBody(gameBoardUpdater) {
         sendPostCreateNewRoom(gameBoardUpdater);
         gameBoardUpdater.postJSONToServer(localStorage.getItem("map"), true);
         isPlayerSendMapToServer = true;
-        // redirectToGameRoom(gameBoardUpdater);
+
     })
     lobby.appendChild(createNewRoomButton);
 
@@ -81,25 +85,22 @@ function sendPostCreateNewRoom(gameBoardUpdater) {
     
         request.open("POST", "/index/createNewRoom", true);
         request.send();
-        /*gameBoardUpdater.postJSONToServer(JSON.stringify(localStorage.getItem("map")), true);
-        redirectToGameRoom(gameBoardUpdater);*/
+
     } else { window.alert("Set your tactics"); }
 }
 
 function redirectToGameRoom(gameBoardUpdater, isSelect) {
-    console.log("redirectToGameRoom() = > " + gameBoardUpdater);
     
     if (isSelect) {
         var redirectInternal = setInterval(() => {
             console.log("In select");
-            // gameBoardUpdater.postJSONToServer(localStorage.getItem("map"), true);
-            // gameBoardUpdater.getJSONFromServerInitial();
+
             gameBoardUpdater.postJSONToServer(localStorage.getItem("map"), true);
             isPlayerSendMapToServer = true;
         }, 1000);
     }
 
-    gameBoard(gameBoardUpdater, redirectInternal);
+    startGameBoard(gameBoardUpdater, redirectInternal);
 }
 
 
@@ -160,12 +161,13 @@ function buildRooms(array, gameBoardUpdater, lobbyTimeOut) {
                     joinButton.setAttribute("id", "join-button");
                     joinButton.textContent = "JOIN";
                     joinButton.addEventListener('click', () => {
-                        console.log("Join clicked!");
+
+                        console.log("Joined!");
                         enterARoom()
                         gameBoardUpdater.getJSONFromServerInitial();
                         gameBoardUpdater.postJSONToServer(localStorage.getItem("map"), true);
                         isPlayerSendMapToServer = true;
-                        // redirectToGameRoom(gameBoardUpdater, true);
+
                     })
                     roomDiv.appendChild(joinButton);
                 } else {
@@ -177,7 +179,7 @@ function buildRooms(array, gameBoardUpdater, lobbyTimeOut) {
                         } else {
                             clearTimeout(lobbyTimeOut);
                             gameBoardUpdater.getJSONFromServerInitial();
-                            gameBoard(gameBoardUpdater);
+                            startGameBoard(gameBoardUpdater);
                         }
                     });
                 }
