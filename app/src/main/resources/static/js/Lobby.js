@@ -1,6 +1,7 @@
 "use strict";
 
-import {startGameBoard} from "./GameBoardsContainer.js";
+import { startGameBoard } from "./GameBoardsContainer.js";
+import { LobbyStatusChecker } from "./LobbyStatusChecker.js";
 import { GameBoardUpdater } from "./GameBoardUpdater.js";
 import { tactics } from "./tactics.js";
 
@@ -18,6 +19,7 @@ export class Lobby {
     constructor(){}
 
     launch() {
+        this.statusChecker = new LobbyStatusChecker();
         this.gameBoardUpdater = new GameBoardUpdater();
         constructBody(this.gameBoardUpdater);
         fillRooms(this.gameBoardUpdater);
@@ -66,8 +68,7 @@ function constructBody(gameBoardUpdater) {
     createNewRoomButton.addEventListener('click', () => {
         sendPostCreateNewRoom(gameBoardUpdater);
         gameBoardUpdater.postJSONToServer(localStorage.getItem("map"), true);
-        isPlayerSendMapToServer = true;
-
+        statucChecker.run();
     })
     lobby.appendChild(createNewRoomButton);
 
@@ -82,7 +83,9 @@ function sendPostCreateNewRoom(gameBoardUpdater) {
     if (localStorage.getItem("map") != null) {
     
         const request = new XMLHttpRequest();
-    
+        request.onreadystatechange = () => {
+
+        }
         request.open("POST", "/index/createNewRoom", true);
         request.send();
 
