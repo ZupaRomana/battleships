@@ -1,6 +1,7 @@
 "use strict";
 import {gameBoard} from "./main.js";
 import { GameBoardUpdater } from "./GameBoardUpdater.js";
+import { tactics } from "./tactics.js";
 var onlinePlayers = 0;
 
 const INDEX_ROOM_ID = 1;
@@ -8,19 +9,22 @@ const INDEX_HOST_NAME = 2;
 const INDEX_HOST_SESSION = 3;
 const INDEX_CLIENT_NAME = 4;
 const INDEX_CLIENT_SESSION = 5;
+var hostname;
+var isPlayerSendMapToServer = false;
 
 export class Lobby {
     constructor(){}
 
     launch() {
-        constructBody();
-        fillRooms();
+        this.gameBoardUpdater = new GameBoardUpdater();
+        constructBody(this.gameBoardUpdater);
+        fillRooms(this.gameBoardUpdater);
     }
 }
 
-function constructBody() {
+function constructBody(gameBoardUpdater) {
 
-    const gameBoardUpdater = new GameBoardUpdater();
+    
 
     const mainDiv = document.querySelector('#main-container');
 
@@ -43,6 +47,7 @@ function constructBody() {
     lobbyHeaderYourTacticsButton.textContent = "Your tactics";
 
     lobbyHeaderYourTacticsButton.addEventListener("click", function() {
+        document.getElementById("lobby").remove();
         new tactics().showTactics()});
     lobbyHeader.appendChild(lobbyHeaderYourTacticsButton);
 
@@ -55,8 +60,10 @@ function constructBody() {
     createNewRoomButton.setAttribute('id', 'create-new-room');
     createNewRoomButton.innerHTML = "Create new room";
     createNewRoomButton.addEventListener('click', () => {
-        sendPostCreateNewRoom();
-        redirectToGameRoom();
+        sendPostCreateNewRoom(gameBoardUpdater);
+        gameBoardUpdater.postJSONToServer(localStorage.getItem("map"), true);
+        isPlayerSendMapToServer = true;
+        // redirectToGameRoom(gameBoardUpdater);
     })
     lobby.appendChild(createNewRoomButton);
 
@@ -66,24 +73,44 @@ function constructBody() {
 
 }
 
-function sendPostCreateNewRoom() {
+function sendPostCreateNewRoom(gameBoardUpdater) {
 
     if (localStorage.getItem("map") != null) {
-
-    const request = new XMLHttpRequest();
-
-    request.open("POST", "/index/createNewRoom", true);
-    request.send();
+    
+        const request = new XMLHttpRequest();
+    
+        request.open("POST", "/index/createNewRoom", true);
+        request.send();
+        /*gameBoardUpdater.postJSONToServer(JSON.stringify(localStorage.getItem("map")), true);
+        redirectToGameRoom(gameBoardUpdater);*/
     } else { window.alert("Set your tactics"); }
 }
 
-function redirectToGameRoom() {
-    gameBoardUpdater.getJSONFromServerInitial();
-    gameBoard();
+function redirectToGameRoom(gameBoardUpdater, isSelect) {
+    console.log("redirectToGameRoom() = > " + gameBoardUpdater);
     
+    if (isSelect) {
+        var redirectInternal = setInterval(() => {
+            console.log("In select");
+            // gameBoardUpdater.postJSONToServer(localStorage.getItem("map"), true);
+            // gameBoardUpdater.getJSONFromServerInitial();
+            gameBoardUpdater.postJSONToServer(localStorage.getItem("map"), true);
+            isPlayerSendMapToServer = true;
+        }, 1000);
+    }
+
+    gameBoard(gameBoardUpdater, redirectInternal);
 }
 
-function fillRooms() {
+
+function enterARoom() {
+    const request = new XMLHttpRequest();
+    request.open("POST", "/index/enterARoom", true);
+    request.send(hostname);
+}
+
+function fillRooms(gameBoardUpdater) {
+
      const request = new XMLHttpRequest();
 
      request.onreadystatechange = function() {
@@ -95,16 +122,16 @@ function fillRooms() {
             let lobbyHeaderPlayersCount = document.querySelector('#counter');
             lobbyHeaderPlayersCount.innerHTML = `Players online: ${onlinePlayers}`;
 
-            buildRooms(array);
+            buildRooms(array, gameBoardUpdater, lobbyTimeOut);
         };
     };
     request.open("GET", "/index/count", true);
     request.send();
-    setTimeout(() => { fillRooms();}, 1000);
+    var lobbyTimeOut = setTimeout(() => { fillRooms(gameBoardUpdater);}, 1000);
 }
 
-function buildRooms(array) {
-
+function buildRooms(array, gameBoardUpdater, lobbyTimeOut) {
+   
     const roomsContainer = document.querySelector("#lobby-rooms-container");
     roomsContainer.innerHTML = "";
 
@@ -121,10 +148,11 @@ function buildRooms(array) {
 
                 let p1Div = document.createElement("div");
                 p1Div.innerHTML = "P1: " + room[INDEX_HOST_NAME];
+                hostname = room[INDEX_HOST_NAME];
                 roomDiv.appendChild(p1Div);
 
                 let p2Div = document.createElement("div");
-                p2Div.innerHTML = room[INDEX_CLIENT_NAME] == "null" ? "FREE" : "P1: " + room[INDEX_CLIENT_NAME];
+                p2Div.innerHTML = room[INDEX_CLIENT_NAME] == "null" ? "FREE" : "P2: " + room[INDEX_CLIENT_NAME];
                 roomDiv.appendChild(p2Div);
 
                 if (room[INDEX_CLIENT_NAME] == "null") {
@@ -132,10 +160,28 @@ function buildRooms(array) {
                     joinButton.setAttribute("id", "join-button");
                     joinButton.textContent = "JOIN";
                     joinButton.addEventListener('click', () => {
-                        redirectToGameRoom();
+                        console.log("Join clicked!");
+                        enterARoom()
+                        gameBoardUpdater.getJSONFromServerInitial();
+                        gameBoardUpdater.postJSONToServer(localStorage.getItem("map"), true);
+                        isPlayerSendMapToServer = true;
+                        // redirectToGameRoom(gameBoardUpdater, true);
                     })
                     roomDiv.appendChild(joinButton);
+                } else {
+                    roomDiv.addEventListener("click", () => {
+                        if (!isPlayerSendMapToServer) {
+                            clearTimeout(lobbyTimeOut);
+                            redirectToGameRoom(gameBoardUpdater, true);
+                            
+                        } else {
+                            clearTimeout(lobbyTimeOut);
+                            gameBoardUpdater.getJSONFromServerInitial();
+                            gameBoard(gameBoardUpdater);
+                        }
+                    });
                 }
+
 
                 roomsContainer.appendChild(roomDiv);
 
