@@ -21,6 +21,7 @@ public class GameBoardUpdater implements HttpHandler {
     private String lastPostSessionId;
     private String lastGetSessionId;
     private boolean isInit;
+    private List<String> sessionsIdReceivedInitMap = new ArrayList<>();
 
     @Override
     public void handle(HttpExchange httpExchange) {
@@ -28,12 +29,14 @@ public class GameBoardUpdater implements HttpHandler {
         String cookieStr = httpExchange.getRequestHeaders().getFirst("Cookie");
         String method = httpExchange.getRequestMethod();
         HttpCookie cookie = HttpCookie.parse(cookieStr).get(0);
+        String sessionID = cookie.getValue();
 
         URI uri = httpExchange.getRequestURI();
         System.out.println("\n"+uri.toString());
         System.out.println(method + " - " + cookieStr);
+
         if (method.equals("POST")) {
-            lastPostSessionId = cookie.getValue();
+            lastPostSessionId = sessionID;
             if (lastPostSessionId != null) {
                 if (uri.toString().contains("isInit=true") && !tacticsMap.containsKey(lastPostSessionId)) {
                     getGameState(httpExchange);
@@ -45,19 +48,33 @@ public class GameBoardUpdater implements HttpHandler {
                 }
             }
         } else if (method.equals("GET")) {
-            lastGetSessionId = cookie.getValue();
+            lastGetSessionId = sessionID;
             if (isInit) {
                 for (String key: tacticsMap.keySet()) {
                    if (key != lastGetSessionId && key != null) {
                        gameState = tacticsMap.get(key);
-                        isInit = false;
+                       sessionsIdReceivedInitMap.add(lastGetSessionId);
+                       System.out.println(lastGetSessionId + " <- SHOULD RECEIVE MAP");
                    }
                 }
+                checkSessionsIfReceivedMap();
             }
             System.out.println(lastPostSessionId + " <- POST GET - >" + lastGetSessionId);
-            System.out.println("Game state: " + gameState);
             System.out.println("MAP->> "+tacticsMap.keySet() + " - " + tacticsMap.get(lastPostSessionId));
             sendGameState(httpExchange);
+        }
+    }
+
+    private void checkSessionsIfReceivedMap() {
+        int counter = tacticsMap.keySet().size();
+        for (String key: tacticsMap.keySet()) {
+            System.out.println(key + " <- KEY SESSION LIST -> " + sessionsIdReceivedInitMap);
+            if (sessionsIdReceivedInitMap.contains(key)) {
+                counter--;
+            }
+        }
+        if (counter == 0) {
+            isInit = false;
         }
     }
 
