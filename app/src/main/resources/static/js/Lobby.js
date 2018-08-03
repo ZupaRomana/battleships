@@ -21,12 +21,12 @@ export class Lobby {
     launch() {
         this.statusChecker = new LobbyStatusChecker();
         this.gameBoardUpdater = new GameBoardUpdater();
-        constructBody(this.gameBoardUpdater);
-        fillRooms(this.gameBoardUpdater);
+        constructBody(this.gameBoardUpdater, this.statusChecker);
+        fillRooms(this.gameBoardUpdater, this.statusChecker);
     }
 }
 
-function constructBody(gameBoardUpdater) {
+function constructBody(gameBoardUpdater, statusChecker) {
 
     
 
@@ -66,8 +66,7 @@ function constructBody(gameBoardUpdater) {
     createNewRoomButton.setAttribute('id', 'create-new-room');
     createNewRoomButton.innerHTML = "Create new room";
     createNewRoomButton.addEventListener('click', () => {
-        sendPostCreateNewRoom(gameBoardUpdater);
-        statucChecker.run();
+        sendPostCreateNewRoom(gameBoardUpdater, statusChecker);
     })
     lobby.appendChild(createNewRoomButton);
 
@@ -77,14 +76,14 @@ function constructBody(gameBoardUpdater) {
 
 }
 
-function sendPostCreateNewRoom(gameBoardUpdater) {
+function sendPostCreateNewRoom(gameBoardUpdater, statusChecker) {
 
     if (localStorage.getItem("map") != null) {
     
         const request = new XMLHttpRequest();
         request.onreadystatechange = () => {
-
-        }
+            statusChecker.run();
+        };
         request.open("POST", "/index/createNewRoom", true);
         request.send();
 
@@ -112,20 +111,20 @@ function enterARoom() {
     request.send(hostname);
 }
 
-function fillRooms(gameBoardUpdater) {
+function fillRooms(gameBoardUpdater, statusChecker) {
 
      const request = new XMLHttpRequest();
 
-     request.onreadystatechange = function() {
+     request.onreadystatechange = () => {
 
-        if (this.readyState == 4 && this.status == 200) {
-            onlinePlayers = JSON.parse(this.responseText)[0];
-            let array = JSON.parse(this.responseText)[1];
+        if (request.readyState == 4 && request.status == 200) {
+            onlinePlayers = JSON.parse(request.responseText)[0];
+            let array = JSON.parse(request.responseText)[1];
 
             let lobbyHeaderPlayersCount = document.querySelector('#counter');
             lobbyHeaderPlayersCount.innerHTML = `Players online: ${onlinePlayers}`;
-            if (this.statusChecker.hasRoomPlayers) {
-                let gameRoom = this.statusChecker.getGameRoom(); 
+            if (statusChecker.hasRoomPlayers) {
+                let gameRoom = localStorage.getItem("gameRoom"); 
                 lobbyHeaderPlayersCount.innerHTML = lobbyHeaderPlayersCount + `<br> `; 
             }
 
@@ -134,7 +133,7 @@ function fillRooms(gameBoardUpdater) {
     };
     request.open("GET", "/index/count", true);
     request.send();
-    var lobbyTimeOut = setTimeout(() => { fillRooms(gameBoardUpdater);}, 1000);
+    var lobbyTimeOut = setTimeout(() => { fillRooms(gameBoardUpdater, statusChecker); }, 1000);
 }
 
 function buildRooms(array, gameBoardUpdater, lobbyTimeOut) {
