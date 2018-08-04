@@ -10,16 +10,19 @@ public class GameRoom {
     private String clientPlayerName;
     private boolean isPlayerReady;
 
+    private Tactics tactics;
+
     private static int actualId = 0;
     private int id;
 
-    public GameRoom(String hostingPlayerSessionId, String hostPlayerName) {
+    public GameRoom(String hostingPlayerSessionId, String hostPlayerName, Tactics tactics) {
         this.hostingPlayerSessionId = hostingPlayerSessionId;
         this.hostPlayerName = hostPlayerName;
         isHostReady = false;
         this.clientPlayerSessionId = null;
         this.clientPlayerName = null;
         isPlayerReady = false;
+        this.tactics = tactics;
         this.id = actualId++;
     }
 
@@ -77,5 +80,13 @@ public class GameRoom {
 
     public int getId() {
         return id;
+    }
+
+    public Tactics getTactics() {
+        return tactics;
+    }
+
+    public boolean isPlayerPostMap(String sessionId) {
+        return tactics.contains(sessionId);
     }
 }
