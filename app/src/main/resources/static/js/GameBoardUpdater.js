@@ -10,6 +10,12 @@ export class GameBoardUpdater {
         return JSON.stringify(gameBoardContainer);
     }
 
+    postPlayerMapToServer(map) {
+        this.httpExec.open("POST", "/gameBoardUpdater/playersTactics", true);
+        this.httpExec.setRequestHeader("Content-Type", "application/json");
+        this.httpExec.send(map);
+    }
+
     postJSONToServer(json, isBeginOfGame = false) {
         if (!isBeginOfGame) {
             this.httpExec.open("POST", "/gameBoardUpdater", true);
