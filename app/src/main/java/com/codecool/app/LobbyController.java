@@ -46,7 +46,7 @@ public class LobbyController implements HttpHandler {
     private void handleGet(HttpExchange httpExchange) throws IOException {
 
         String requestUri = getRequestUri(httpExchange.getRequestURI());
-        System.out.println(requestUri + " <- URI");
+        System.out.println("/"+ requestUri + " <- URI");
         switch (requestUri) {
             case "lobbyController":
 
@@ -63,12 +63,14 @@ public class LobbyController implements HttpHandler {
 
     private String getJSONGameRoom() {
         JSONObject json = new JSONObject();
+        String hostId = gameRoom.getHostingPlayerSessionId();
+        String playerId = gameRoom.getClientPlayerSessionId();
         json.put("hasPlayers", true);
         json.put("hostName", gameRoom.getHostPlayerName());
-        json.put("hostSessionId", gameRoom.getHostingPlayerSessionId());
+        json.put("hostSendMap", gameRoom.playerPostMap(hostId));
         json.put("isHostReady", gameRoom.getIsHostReady());
         json.put("playerName", gameRoom.getClientPlayerName());
-        json.put("platerSessionId", gameRoom.getClientPlayerSessionId());
+        json.put("playerSendMap", gameRoom.playerPostMap(playerId));
         json.put("isPlayerReady", gameRoom.getIsPlayerReady());
         return json.toString();
     }
