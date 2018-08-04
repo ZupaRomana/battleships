@@ -78,14 +78,13 @@ public class LoginPage implements HttpHandler {
     }
 
     private void enterARoom() {
-        System.out.println("enterARoom()");
         String cookie = httpExchange.getRequestHeaders().getFirst("Cookie");
-        HttpCookie httpCookie = HttpCookie.parse(cookie).get(0);
-        String sessionId = httpCookie.getValue();
+        String sessionId = HttpCookie.parse(cookie).get(0).getValue();
+
         GameRoomsContainer gameRoomsContainer = GameRoomsContainer.getInstance();
-        InputStream is = httpExchange.getRequestBody();
-        String hostName = getHostName(is);
-        System.out.println(sessionId + " <- Session wich want enter a room| Hostname of room -> " + hostName);
+        String hostName = getHostName(httpExchange.getRequestBody());
+
+        System.out.println(sessionId + " <- Session want enter a room| Hostname of room -> " + hostName);
         for (int i = 0; i < gameRoomsContainer.getAll().size(); i++) {
             GameRoom gameRoom = gameRoomsContainer.get(i);
             if (gameRoom.getHostPlayerName().equalsIgnoreCase(hostName) && gameRoom.getClientPlayerName() == null) {
@@ -103,7 +102,7 @@ public class LoginPage implements HttpHandler {
 
         String playerName = AccountContainer.getInstance().get(sessionId);
 
-        GameRoom gameRoom = new GameRoom(sessionId, playerName);
+        GameRoom gameRoom = new GameRoom(sessionId, playerName, new Tactics());
         GameRoomsContainer grc = GameRoomsContainer.getInstance();
         grc.add(gameRoom);
         System.out.println(GameRoomsContainer.getInstance());
