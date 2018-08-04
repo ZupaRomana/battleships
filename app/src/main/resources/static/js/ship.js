@@ -91,8 +91,6 @@ function checkShipsAmount() {
 function saveToLocalStorage() {
     let allSquares = JSON.stringify(_map);
     localStorage.setItem("map", allSquares);
-    let updater = new GameBoardUpdater();
-    updater.postJSONToServer(allSquares, true);
 }
 
 function colorAllSquares(square, ship) {
