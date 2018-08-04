@@ -72,6 +72,7 @@ public class LobbyController implements HttpHandler {
         json.put("isHostReady", gameRoom.getIsHostReady());
         json.put("playerName", gameRoom.getClientPlayerName());
         json.put("isPlayerReady", gameRoom.getIsPlayerReady());
+        json.put("arePlayersReady", gameRoom.arePlayersReady());
 
         return json.toString();
     }
