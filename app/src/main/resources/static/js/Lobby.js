@@ -14,7 +14,7 @@ const INDEX_CLIENT_NAME = 4;
 const INDEX_CLIENT_SESSION = 5;
 var hostname;
 var isPlayerSendMapToServer = false;
-
+var isHost;
 export class Lobby {
     constructor(){}
 
@@ -66,7 +66,10 @@ function constructBody(gameBoardUpdater, statusChecker) {
     createNewRoomButton.setAttribute('id', 'create-new-room');
     createNewRoomButton.innerHTML = "Create new room";
     createNewRoomButton.addEventListener('click', () => {
-        sendPostCreateNewRoom(gameBoardUpdater, statusChecker);
+        sendPostCreateNewRoom(statusChecker);
+        isHost = true;
+        let updater = new GameBoardUpdater(isHost);
+        updater.postPlayerMapToServer();
     })
     lobby.appendChild(createNewRoomButton);
 
@@ -76,7 +79,7 @@ function constructBody(gameBoardUpdater, statusChecker) {
 
 }
 
-function sendPostCreateNewRoom(gameBoardUpdater, statusChecker) {
+function sendPostCreateNewRoom(statusChecker) {
 
     if (localStorage.getItem("map") != null) {
     
@@ -131,8 +134,8 @@ function fillRooms(gameBoardUpdater, statusChecker) {
                     return isReady ? "Ready!": "Not ready!"
                 };
                 lobbyHeaderPlayersCount.innerHTML = `Players online: ${onlinePlayers}` +
-                 `<br>${gameRoom.hostName}: ${isPlayerReady(gameRoom.isHostReady)}
-                 <br>${playerName ? playerName: "Waiting for player!"}: ${isPlayerReady(gameRoom.isPlayerReady)}`;
+                 `<br>${gameRoom.hostName}: ${isPlayerReady(statusChecker.isFirstPlayerReady)}
+                 <br>${playerName ? playerName: "Waiting for player!"}: ${isPlayerReady(statusChecker.isSecondPlayerReady)}`;
                  lobbyHeaderPlayersCount.style.fontSize = "20px";
             }
 
@@ -174,15 +177,17 @@ function buildRooms(array, gameBoardUpdater, lobbyTimeOut, statusChecker) {
                     joinButton.setAttribute("id", "join-button");
                     joinButton.textContent = "JOIN";
                     joinButton.addEventListener('click', () => {
-
-                        console.log("Joined!");
                         enterARoom()
                         statusChecker.run();
+                        isHost = false;
+                        let updater = new GameBoardUpdater(isHost);
+                        updater.postPlayerMapToServer();
+                        //updater.postPlayerMapToServer(localStorage.getItem("map"));
                         /*gameBoardUpdater.getJSONFromServerInitial();
                         gameBoardUpdater.postJSONToServer(localStorage.getItem("map"), true);
                         isPlayerSendMapToServer = true;*/
 
-                    })
+                    });
                     roomDiv.appendChild(joinButton);
                 } else {
                     roomDiv.addEventListener("click", () => {
