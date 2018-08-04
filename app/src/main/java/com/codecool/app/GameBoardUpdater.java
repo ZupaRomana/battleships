@@ -82,17 +82,18 @@ public class GameBoardUpdater implements HttpHandler {
                 }
                 break;
             case "playersTactics":
-                Tactics tactics = gameRoom.getTactics();
-                if (!tactics.contains(sessionId)) {
-                    tactics.addTactic(sessionId, getGameState(httpExchange));
-                    System.out.println("Added tactic!");
-                }
+                addPlayerMap(sessionId, httpExchange);
+
 
         }
     }
 
-    private void addPlayerMap(String sessionId) {
-
+    private void addPlayerMap(String sessionId, HttpExchange httpExchange) {
+        Tactics tactics = gameRoom.getTactics();
+        if (!tactics.contains(sessionId)) {
+            tactics.addTactic(sessionId, getGameState(httpExchange));
+            System.out.println("Player tactic: " + tactics.getTactic(sessionId));
+        }
     }
 
 
