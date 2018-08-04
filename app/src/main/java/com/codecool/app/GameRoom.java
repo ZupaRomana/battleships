@@ -4,8 +4,11 @@ public class GameRoom {
 
     private String hostingPlayerSessionId;
     private String hostPlayerName;
+    private boolean isHostReady;
+
     private String clientPlayerSessionId;
     private String clientPlayerName;
+    private boolean isPlayerReady;
 
     private static int actualId = 0;
     private int id;
@@ -13,8 +16,10 @@ public class GameRoom {
     public GameRoom(String hostingPlayerSessionId, String hostPlayerName) {
         this.hostingPlayerSessionId = hostingPlayerSessionId;
         this.hostPlayerName = hostPlayerName;
+        isHostReady = false;
         this.clientPlayerSessionId = null;
         this.clientPlayerName = null;
+        isPlayerReady = false;
         this.id = actualId++;
     }
 
@@ -28,6 +33,14 @@ public class GameRoom {
 
     public String getHostPlayerName() {
         return hostPlayerName;
+    }
+
+    public boolean getIsHostReady() {
+        return isHostReady;
+    }
+
+    public void setHostReady(boolean hostReady) {
+        this.isHostReady = hostReady;
     }
 
     public void setHostPlayerName(String hostPlayerName) {
@@ -48,6 +61,14 @@ public class GameRoom {
 
     public void setClientPlayerSessionId(String clientPlayerSessionId) {
         this.clientPlayerSessionId = clientPlayerSessionId;
+    }
+
+    public boolean getIsPlayerReady() {
+        return isPlayerReady;
+    }
+
+    public void setPlayerReady(boolean playerReady) {
+        this.isPlayerReady = playerReady;
     }
 
     public static int getActualId() {
