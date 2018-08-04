@@ -1,7 +1,9 @@
 "use strict";
 
 export class GameBoardUpdater {
-    constructor() {
+    constructor(isHost = false) {
+        this.postPlayerMapTimeouts = [];
+        this.isHost = isHost;
         this.httpExec = new XMLHttpRequest();
         this.isBeginOfGame = true;
     }
@@ -10,10 +12,32 @@ export class GameBoardUpdater {
         return JSON.stringify(gameBoardContainer);
     }
 
-    postPlayerMapToServer(map) {
+    postPlayerMapToServer() {
+        console.log("Posting map! ");
+        let deleteTimeouts = () => {
+            let gameRoom = JSON.parse(localStorage.getItem("gameRoom"));
+            if (gameRoom) {
+                if (this.isHost) {
+                    if (gameRoom.isHostReady) {
+                        while (this.postPlayerMapTimeouts > 0) {
+                            clearTimeout(this.postPlayerMapTimeouts.pop());
+                        }
+                    }
+                } else {
+                    if (gameRoom.isPlayerReady) {
+                        while (this.postPlayerMapTimeouts > 0) {
+                            clearTimeout(this.postPlayerMapTimeouts.pop());
+                        }
+                    }
+                }  
+            }
+        };
+
         this.httpExec.open("POST", "/gameBoardUpdater/playersTactics", true);
         this.httpExec.setRequestHeader("Content-Type", "application/json");
-        this.httpExec.send(map);
+        this.httpExec.send(localStorage.getItem("map"));
+        this.postPlayerMapTimeouts.push(setTimeout(() => { this.postPlayerMapToServer(); }, 5000));
+        deleteTimeouts();
     }
 
     postJSONToServer(json, isBeginOfGame = false) {
