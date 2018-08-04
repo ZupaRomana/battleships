@@ -1,3 +1,5 @@
+import { GameBoardUpdater } from "./GameBoardUpdater";
+
 "use strict";
 
 var hasGameRoomPlayersTimeouts = [];
@@ -6,7 +8,9 @@ export class LobbyStatusChecker {
         this.updateGameRoomTimeout = [];
         this.httpExec = new XMLHttpRequest();
         this.hasRoomPlayers = false; 
-        this.arePlayersReady = false;        
+        this.arePlayersReady = false;
+        this.isFirstPlayerReady = false;
+        this.isSecondPlayerReady = false;       
     }
     
     run() {
@@ -24,7 +28,7 @@ export class LobbyStatusChecker {
     checkIfPlayersAreReady() {
         if (this.gameRoom) {
             if (this.gameRoom.isHostReady & this.gameRoom.isPlayerReady) {
-                this.arePlayersReady = true;
+                let updater = new GameBoardUpdater();
                 console.log("Players are ready!" + " Time out: " + playersAreReadyTimeout);
                 clearTimeout(playersAreReadyTimeout)
             }
@@ -39,13 +43,9 @@ export class LobbyStatusChecker {
         let json = localStorage.getItem("gameRoom");
         if (json) {
             this.gameRoom = JSON.parse(json);
-            if (this.gameRoom.arePlayersReady) {
-                for (let timeout of this.updateGameRoomTimeout) {
-                    clearTimeout(timeout);
-                }
-            }
         }
         this.updateGameRoomTimeout.push(setTimeout(() => { this.updateGameRoomStatus(); }, 5000));
+        clearUpdateTimeouts(this.gameRoom, this.updateGameRoomTimeout);
     }
 }
 
@@ -74,22 +74,33 @@ function checkIfGameRoomHasPlayers(lobby) {
         if (gameRoom.hasPlayers) {
             lobby.hasRoomPlayers = true;
             lobby.gameRoom = gameRoom;
-            console.log("Game room has players!"  + " Time out: " + gameRoomTimeout);
-            clearTimeout(gameRoomTimeout);
-            clearHasRoomPlayersTimeout(lobby.hasPlayers)
+            console.log("Game room has players!");
         }
     }
-    var gameRoomTimeout = setTimeout(
+
+    let gameRoomTimeout = setTimeout(
         () => { 
             checkIfGameRoomHasPlayers(lobby);
     }, 1000);
+
     hasGameRoomPlayersTimeouts.push(gameRoomTimeout);
+    clearHasRoomPlayersTimeout(lobby.hasPlayers);
 }
 
 function clearHasRoomPlayersTimeout(hasPlayers) {
     if (hasPlayers) {
         for (let timeout of hasGameRoomPlayersTimeouts) {
             clearTimeout(timeout);
+        }
+    }
+}
+
+function clearUpdateTimeouts(gameRoom, timeouts) {
+    if (gameRoom) {
+        if (gameRoom.arePlayersReady) {
+            while (timeouts.length > 0) {
+                clearTimeout(timeouts.pop());
+            }
         }
     }
 }
