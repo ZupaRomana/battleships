@@ -1,5 +1,7 @@
 package com.codecool.app;
 
+import java.util.List;
+
 public class GameRoom {
 
     private String hostingPlayerSessionId;
@@ -93,5 +95,11 @@ public class GameRoom {
         if (clientPlayerSessionId != null && tactics.contains(clientPlayerSessionId)) {
             isPlayerReady = true;
         }
+    }
+
+    public boolean arePlayersReady() {
+        List<String> playersWithEnemyMap = tactics.getPlayersWithEnemyMap();
+        return playersWithEnemyMap.contains(hostingPlayerSessionId) &&
+                playersWithEnemyMap.contains(clientPlayerSessionId);
     }
 }
