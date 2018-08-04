@@ -63,12 +63,13 @@ public class LobbyController implements HttpHandler {
 
     private String getJSONGameRoom() {
         JSONObject json = new JSONObject();
+        json.put("hasPlayers", true);
         json.put("hostName", gameRoom.getHostPlayerName());
         json.put("hostSessionId", gameRoom.getHostingPlayerSessionId());
-        json.put("hostIsReady", gameRoom.getIsHostReady());
+        json.put("isHostReady", gameRoom.getIsHostReady());
         json.put("playerName", gameRoom.getClientPlayerName());
         json.put("platerSessionId", gameRoom.getClientPlayerSessionId());
-        json.put("playerIsReady", gameRoom.getIsPlayerReady());
+        json.put("isPlayerReady", gameRoom.getIsPlayerReady());
         return json.toString();
     }
 }
