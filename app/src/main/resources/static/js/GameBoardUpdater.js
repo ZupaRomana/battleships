@@ -13,7 +13,7 @@ export class GameBoardUpdater {
     }
 
     postPlayerMapToServer() {
-        console.log("Posting map! ");
+        console.log("Posting map!");
         let deleteTimeouts = () => {
             let gameRoom = JSON.parse(localStorage.getItem("gameRoom"));
             if (gameRoom) {
@@ -40,6 +40,22 @@ export class GameBoardUpdater {
         deleteTimeouts();
     }
 
+    getEnemyMapFromServer() {
+        console.log("Getting enemy map!");
+        this.httpExec.onreadystatechange = () => {
+            if (this.httpExec.status == 200 & this.httpExec.readyState == 4) {
+                let json = this.httpExec.response;
+                if (json) {
+                    localStorage.setItem("enemyMap", this.httpExec.response);
+                } else {
+                    console.log("Cannot load resources! " + json + " <- JSON")
+                }
+            }
+        };
+        this.httpExec.open("GET", "/gameBoardUpdater/playersTactics", true);
+        this.httpExec.send(null);
+    }
+
     postJSONToServer(json, isBeginOfGame = false) {
         if (!isBeginOfGame) {
             this.httpExec.open("POST", "/gameBoardUpdater", true);
@@ -60,7 +76,7 @@ export class GameBoardUpdater {
                 if (json) {
                     localStorage.setItem("enemyMap", json);
                 } else {
-                    console.log("cannot load resources!" + json + " <- JSON");
+                    console.log("cannot load resources! " + json + " <- JSON");
                 }
             }
         };
