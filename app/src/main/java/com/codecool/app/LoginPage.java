@@ -59,7 +59,7 @@ public class LoginPage implements HttpHandler {
     private void prepareResponsePost() throws IOException
     {
         String data = getDataFromURI();
-
+        System.out.println(data + " <- URI");
         switch (data){
             case "index":
                 catchData();
