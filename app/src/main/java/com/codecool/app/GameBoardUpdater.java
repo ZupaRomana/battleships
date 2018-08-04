@@ -17,6 +17,7 @@ import java.util.TreeMap;
 public class GameBoardUpdater implements HttpHandler {
 
     private Map<String, String> tacticsMap = new TreeMap<>();
+    private GameRoom gameRoom;
     private String gameState;
     private String lastPostSessionId;
     private String lastGetSessionId;
@@ -31,22 +32,14 @@ public class GameBoardUpdater implements HttpHandler {
         HttpCookie cookie = HttpCookie.parse(cookieStr).get(0);
         String sessionID = cookie.getValue();
 
+        gameRoom = GameRoomsContainer.getInstance().get(sessionID);
         URI uri = httpExchange.getRequestURI();
         System.out.println("\n"+uri.toString());
         System.out.println(method + " - " + cookieStr);
 
         if (method.equals("POST")) {
-            lastPostSessionId = sessionID;
-            if (lastPostSessionId != null) {
-                if (uri.toString().contains("isInit=true") && !tacticsMap.containsKey(lastPostSessionId)) {
-                    getGameState(httpExchange);
-                    tacticsMap.put(lastPostSessionId, gameState);
-                    System.out.println(tacticsMap.keySet() + " - Session id: " + sessionID + " - " + tacticsMap.get(lastPostSessionId));
-                    isInit = true;
-                } else {
-                    getGameState(httpExchange);
-                }
-            }
+            handlePost(httpExchange, sessionID);
+
         } else if (method.equals("GET")) {
             lastGetSessionId = sessionID;
             if (isInit) {
@@ -65,6 +58,45 @@ public class GameBoardUpdater implements HttpHandler {
         }
     }
 
+    private String getRequestUri(URI uri) {
+        String[] splitedUri = uri.toString().split("/");
+        return splitedUri[splitedUri.length - 1];
+    }
+
+    private void handlePost(HttpExchange httpExchange, String sessionId) {
+        URI uri = httpExchange.getRequestURI();
+        lastPostSessionId = sessionId;
+        String requestUri = getRequestUri(uri);
+        requestUri = uri.toString().contains("isInit") ? "gameBoardUpdater": requestUri;
+        switch (requestUri) {
+            case "gameBoardUpdater":
+                if (lastPostSessionId != null) {
+                    if (uri.toString().contains("isInit=true") && !tacticsMap.containsKey(lastPostSessionId)) {
+                        getGameState(httpExchange);
+                        tacticsMap.put(lastPostSessionId, gameState);
+                        System.out.println(tacticsMap.keySet() + " - Session id: " + sessionId + " - " + tacticsMap.get(lastPostSessionId));
+                        isInit = true;
+                    } else {
+                        getGameState(httpExchange);
+                    }
+                }
+                break;
+            case "playersTactics":
+                Tactics tactics = gameRoom.getTactics();
+                if (!tactics.contains(sessionId)) {
+                    tactics.addTactic(sessionId, getGameState(httpExchange));
+                    System.out.println("Added tactic!");
+                }
+
+        }
+    }
+
+    private void addPlayerMap(String sessionId) {
+
+    }
+
+
+
     private void checkSessionsIfReceivedMap() {
         int counter = tacticsMap.keySet().size();
         for (String key: tacticsMap.keySet()) {
@@ -78,7 +110,7 @@ public class GameBoardUpdater implements HttpHandler {
         }
     }
 
-    private void getGameState(HttpExchange httpExchange) {
+    private String getGameState(HttpExchange httpExchange) {
         InputStream is = httpExchange.getRequestBody();
 
         List<Byte> byteList = getBytesList(is);
@@ -87,6 +119,7 @@ public class GameBoardUpdater implements HttpHandler {
             bytes[i] = byteList.get(i);
         }
         gameState  = new String(bytes);
+        return gameState;
     }
 
     private List<Byte> getBytesList(InputStream is) {
