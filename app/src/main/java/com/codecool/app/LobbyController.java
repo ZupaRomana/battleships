@@ -51,13 +51,15 @@ public class LobbyController implements HttpHandler {
             case "lobbyController":
 
                 String strJSON = getJSONGameRoom();
+                System.out.println(strJSON);
 
                 httpExchange.getResponseHeaders().set("Content-Type", "application/json");
                 httpExchange.sendResponseHeaders(200, strJSON.length());
                 OutputStream os = httpExchange.getResponseBody();
                 os.write(strJSON.getBytes());
                 os.close();
-                System.out.println(strJSON);
+                break;
+
         }
     }
 
