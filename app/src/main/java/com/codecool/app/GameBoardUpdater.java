@@ -3,6 +3,7 @@ package com.codecool.app;
 import com.codecool.app.helpers.AccountContainer;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpPrincipal;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,26 +36,14 @@ public class GameBoardUpdater implements HttpHandler {
         gameRoom = GameRoomsContainer.getInstance().get(sessionID);
         URI uri = httpExchange.getRequestURI();
         System.out.println("\n"+uri.toString());
-        System.out.println(method + " - " + cookieStr);
+        System.out.println(method + " - " + cookieStr + " gameBoardUpdater");
 
         if (method.equals("POST")) {
             handlePost(httpExchange, sessionID);
 
         } else if (method.equals("GET")) {
-            lastGetSessionId = sessionID;
-            if (isInit) {
-                for (String key: tacticsMap.keySet()) {
-                   if (key != lastGetSessionId && key != null) {
-                       gameState = tacticsMap.get(key);
-                       sessionsIdReceivedInitMap.add(lastGetSessionId);
-                       System.out.println(lastGetSessionId + " <- SHOULD RECEIVE MAP");
-                   }
-                }
-                checkSessionsIfReceivedMap();
-            }
-            System.out.println(lastPostSessionId + " <- POST GET - >" + lastGetSessionId);
-            System.out.println("MAP->> "+tacticsMap.keySet() + " - " + tacticsMap.get(lastPostSessionId));
-            sendGameState(httpExchange);
+            handleGet(httpExchange, sessionID);
+
         }
     }
 
@@ -88,12 +77,44 @@ public class GameBoardUpdater implements HttpHandler {
         }
     }
 
+    public void handleGet(HttpExchange httpExchange, String sessionId) {
+        String requestUri = getRequestUri(httpExchange.getRequestURI());
+        switch (requestUri) {
+            case "gameBoardUpdater":
+                lastGetSessionId = sessionId;
+                if (isInit) {
+                    for (String key: tacticsMap.keySet()) {
+                        if (key != lastGetSessionId && key != null) {
+                            gameState = tacticsMap.get(key);
+                            sessionsIdReceivedInitMap.add(lastGetSessionId);
+                            System.out.println(lastGetSessionId + " <- SHOULD RECEIVE MAP");
+                        }
+                    }
+                    checkSessionsIfReceivedMap();
+                }
+                System.out.println(lastPostSessionId + " <- POST GET - >" + lastGetSessionId);
+                System.out.println("MAP->> "+tacticsMap.keySet() + " - " + tacticsMap.get(lastPostSessionId));
+                sendGameState(httpExchange);
+                break;
+            case "playersTactics":
+                getOppositePlayerMap(sessionId);
+                sendGameState(httpExchange, true);
+                break;
+        }
+    }
+
     private void addPlayerMap(String sessionId, HttpExchange httpExchange) {
         Tactics tactics = gameRoom.getTactics();
         if (!tactics.contains(sessionId)) {
             tactics.addTactic(sessionId, getGameState(httpExchange));
             System.out.println("Player tactic: " + tactics.getTactic(sessionId));
         }
+    }
+
+    private void getOppositePlayerMap(String sessionId) {
+        Tactics tactics = gameRoom.getTactics();
+        gameState = tactics.getOppisiteTactic(sessionId);
+        tactics.addToPlayersWithEnemyMap(sessionId);
     }
 
 
@@ -142,10 +163,11 @@ public class GameBoardUpdater implements HttpHandler {
         try {
             httpExchange.getResponseHeaders().set("Content-Type", "application/json");
             if (!lastGetSessionId.equals(lastPostSessionId) && lastPostSessionId != null) {
+                httpExchange.getResponseHeaders().set("Content-Type", "application/json");
                 httpExchange.sendResponseHeaders(200, gameState.length());
                 os.write(gameState.getBytes());
                 os.close();
-                System.out.println("Game state: " + gameState + " SENDED");
+                System.out.println("Game state sended: " + gameState);
             } else {
                 httpExchange.sendResponseHeaders(404, "Bad entry!".length());
                 os.write("Bad entry!".getBytes());
@@ -153,6 +175,19 @@ public class GameBoardUpdater implements HttpHandler {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void sendGameState(HttpExchange httpExchange, boolean sendEnemyMap) {
+        OutputStream os = httpExchange.getResponseBody();
+        try {
+            httpExchange.getResponseHeaders().set("Content-Type", "application/json");
+            httpExchange.sendResponseHeaders(200, gameState.length());
+            os.write(gameState.getBytes());
+            os.close();
+            System.out.println("Game state sended: " + gameState);
+        } catch (IOException err) {
+            err.printStackTrace();
         }
     }
 }
