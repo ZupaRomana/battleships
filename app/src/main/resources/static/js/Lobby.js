@@ -14,7 +14,7 @@ const INDEX_CLIENT_NAME = 4;
 const INDEX_CLIENT_SESSION = 5;
 var hostname;
 var isPlayerSendMapToServer = false;
-var isHost;
+export var isHost;
 export class Lobby {
     constructor(){}
 
@@ -171,6 +171,7 @@ function buildRooms(array, gameBoardUpdater, lobbyTimeOut, statusChecker) {
                 let p2Div = document.createElement("div");
                 p2Div.innerHTML = room[INDEX_CLIENT_NAME] == "null" ? "FREE" : "P2: " + room[INDEX_CLIENT_NAME];
                 roomDiv.appendChild(p2Div);
+                roomDiv.setAttribute("disabled", statusChecker.arePlayersReady ? "false": "true");
 
                 if (room[INDEX_CLIENT_NAME] == "null") {
                     let joinButton = document.createElement("button");
