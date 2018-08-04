@@ -124,11 +124,19 @@ function fillRooms(gameBoardUpdater, statusChecker) {
             let lobbyHeaderPlayersCount = document.querySelector('#counter');
             lobbyHeaderPlayersCount.innerHTML = `Players online: ${onlinePlayers}`;
             if (statusChecker.hasRoomPlayers) {
-                let gameRoom = localStorage.getItem("gameRoom"); 
-                lobbyHeaderPlayersCount.innerHTML = lobbyHeaderPlayersCount + `<br> `; 
+                let gameRoom = statusChecker.gameRoom;;
+                let playerName = gameRoom.playerName; 
+
+                let isPlayerReady = (isReady) => {
+                    return isReady ? "Ready!": "Not ready!"
+                };
+                lobbyHeaderPlayersCount.innerHTML = `Players online: ${onlinePlayers}` +
+                 `<br>${gameRoom.hostName}: ${isPlayerReady(gameRoom.isHostReady)}
+                 <br>${playerName ? playerName: "Waiting for player!"}: ${isPlayerReady(gameRoom.isPlayerReady)}`;
+                 lobbyHeaderPlayersCount.style.fontSize = "20px";
             }
 
-            buildRooms(array, gameBoardUpdater, lobbyTimeOut);
+            buildRooms(array, gameBoardUpdater, lobbyTimeOut, statusChecker);
         };
     };
     request.open("GET", "/index/count", true);
@@ -136,7 +144,7 @@ function fillRooms(gameBoardUpdater, statusChecker) {
     var lobbyTimeOut = setTimeout(() => { fillRooms(gameBoardUpdater, statusChecker); }, 1000);
 }
 
-function buildRooms(array, gameBoardUpdater, lobbyTimeOut) {
+function buildRooms(array, gameBoardUpdater, lobbyTimeOut, statusChecker) {
    
     const roomsContainer = document.querySelector("#lobby-rooms-container");
     roomsContainer.innerHTML = "";
@@ -169,9 +177,10 @@ function buildRooms(array, gameBoardUpdater, lobbyTimeOut) {
 
                         console.log("Joined!");
                         enterARoom()
-                        gameBoardUpdater.getJSONFromServerInitial();
+                        statusChecker.run();
+                        /*gameBoardUpdater.getJSONFromServerInitial();
                         gameBoardUpdater.postJSONToServer(localStorage.getItem("map"), true);
-                        isPlayerSendMapToServer = true;
+                        isPlayerSendMapToServer = true;*/
 
                     })
                     roomDiv.appendChild(joinButton);
