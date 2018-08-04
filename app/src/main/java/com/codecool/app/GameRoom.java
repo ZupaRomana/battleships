@@ -86,7 +86,12 @@ public class GameRoom {
         return tactics;
     }
 
-    public boolean isPlayerPostMap(String sessionId) {
-        return tactics.contains(sessionId);
+    public void updatePlayerStatus() {
+        if (tactics.contains(hostingPlayerSessionId)) {
+            isHostReady = true;
+        }
+        if (clientPlayerSessionId != null && tactics.contains(clientPlayerSessionId)) {
+            isPlayerReady = true;
+        }
     }
 }
