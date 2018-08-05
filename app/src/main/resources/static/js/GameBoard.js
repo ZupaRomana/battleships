@@ -78,7 +78,6 @@ export class GameBoard {
         let gameBoard = this.getGameBoardDiv();
         
         for (let i = 0; i < this.gameBoard.length; i++) {
-            console.log(this.gameBoard.length + "lenght");
             let square = this.gameBoard[i];
             this.setEnemyGameBoardColorAddEvent(square, gameBoardUpdater, container);
         }
@@ -91,7 +90,6 @@ export class GameBoard {
         let htmlSquare = square.getHTMLSquare();
         htmlSquare.style.backgroundColor = "cyan";
         let onClick = (e) => {
-            console.log(this.isPlayerMove + " <- isPlayerMove");
             if (this.isPlayerMove) {
                 if (square.isShip) {
                     this.changeSquareToHit(square);
@@ -105,7 +103,6 @@ export class GameBoard {
                     htmlSquare.removeEventListener("click", onClick);
                 }
                 gameBoardUpdater.postJSONToServer(JSON.stringify(container));
-                gameBoardUpdater.isBeginOfGame = false;
             }
         };
         htmlSquare.addEventListener("click", onClick);
