@@ -139,7 +139,6 @@ function fillRooms(gameBoardUpdater, lobby) {
             lobbyHeaderPlayersCount.innerHTML = `Players online: ${onlinePlayers}`;
 
             if (lobby.statusChecker) {
-                console.log(lobby.statusChecker + "inIf");
                 if (lobby.statusChecker.hasRoomPlayers) {
                     let statusChecker = lobby.statusChecker;
                     let gameRoom = statusChecker.gameRoom;
@@ -213,15 +212,9 @@ function buildRooms(array, gameBoardUpdater, lobbyTimeOut, lobby) {
                     roomDiv.appendChild(joinButton);
                 } else {
                     roomDiv.addEventListener("click", () => {
-                        if (!isPlayerSendMapToServer) {
-                            clearTimeout(lobbyTimeOut);
-                            redirectToGameRoom(gameBoardUpdater, true);
-                            
-                        } else {
-                            clearTimeout(lobbyTimeOut);
-                            gameBoardUpdater.getJSONFromServerInitial();
-                            startGameBoard(gameBoardUpdater);
-                        }
+                        clearTimeout(lobbyTimeOut);
+                        gameBoardUpdater.getJSONFromServerInitial();
+                        startGameBoard(gameBoardUpdater);
                     });
                 }
 
