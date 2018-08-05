@@ -1,5 +1,6 @@
 package com.codecool.app;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GameRoom {
@@ -17,6 +18,10 @@ public class GameRoom {
     private static int actualId = 0;
     private int id;
 
+    private List<String> gameState;
+    private String lastPostSessionId;
+    private String lastGetSessionId;
+
     public GameRoom(String hostingPlayerSessionId, String hostPlayerName, Tactics tactics) {
         this.hostingPlayerSessionId = hostingPlayerSessionId;
         this.hostPlayerName = hostPlayerName;
@@ -26,6 +31,9 @@ public class GameRoom {
         isPlayerPostMap = false;
         this.tactics = tactics;
         this.id = actualId++;
+        gameState = new ArrayList<>();
+        this.lastPostSessionId = null;
+        this.lastGetSessionId = null;
     }
 
     public String getHostingPlayerSessionId() {
@@ -93,5 +101,29 @@ public class GameRoom {
         List<String> playersWithEnemyMap = tactics.getPlayersWithEnemyMap();
         return playersWithEnemyMap.contains(hostingPlayerSessionId) &&
                 playersWithEnemyMap.contains(clientPlayerSessionId);
+    }
+
+    public void addGameState(String gameStateAsString) {
+        gameState.add(gameStateAsString);
+    }
+
+    public String getLatestGameState() {
+        return gameState.get(gameState.size() - 1);
+    }
+
+    public String getLastPostSession() {
+        return lastPostSessionId;
+    }
+
+    public String getLastGetSession() {
+        return lastGetSessionId;
+    }
+
+    public void setLastPostSession(String session) {
+        this.lastPostSessionId = session;
+    }
+
+    public void setLastGetSession(String session) {
+        this.lastGetSessionId = session;
     }
 }
