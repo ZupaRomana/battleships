@@ -12,9 +12,7 @@ const INDEX_HOST_NAME = 2;
 const INDEX_HOST_SESSION = 3;
 const INDEX_CLIENT_NAME = 4;
 const INDEX_CLIENT_SESSION = 5;
-var hostname;
-var isPlayerSendMapToServer = false;
-export var isHost;
+
 var isEnteredToRoom;
 
 export class Lobby {
@@ -78,8 +76,7 @@ function constructBody(lobbyStatus) {
             isEnteredToRoom = true;
             lobbyStatus.statusChecker = new LobbyStatusChecker(true);
             sendPostCreateNewRoom(lobbyStatus.statusChecker);
-            isHost = true;
-            let updater = new GameBoardUpdater(isHost);
+            let updater = new GameBoardUpdater(true);
             updater.postPlayerMapToServer();
         } else {
             alert("You have already create a room or you have already join a room!");
@@ -202,8 +199,7 @@ function buildRooms(array, gameBoardUpdater, lobbyTimeOut, lobby) {
                             enterARoom(roomId);
                             lobby.statusChecker = new LobbyStatusChecker(false);
                             lobby.statusChecker.run();
-                            isHost = false;
-                            let updater = new GameBoardUpdater(isHost);
+                            let updater = new GameBoardUpdater(false);
                             updater.postPlayerMapToServer();
                         } else {
                             alert("You have already join a room!");
@@ -212,18 +208,16 @@ function buildRooms(array, gameBoardUpdater, lobbyTimeOut, lobby) {
                     roomDiv.appendChild(joinButton);
                 } else {
                     roomDiv.addEventListener("click", () => {
-                        clearTimeout(lobbyTimeOut);
-                        gameBoardUpdater.getJSONFromServerInitial();
-                        startGameBoard(gameBoardUpdater);
+                        if (lobby.statusChecker.arePlayersReady) {
+                            clearTimeout(lobbyTimeOut);
+                            startGameBoard(gameBoardUpdater);
+                        } else {
+                            alert("Players are not ready!");
+                        }
                     });
                 }
-
-
                 roomsContainer.appendChild(roomDiv);
-
             }
-
         }
-
     }
 }
