@@ -5,10 +5,12 @@ import { isHost } from "./Lobby.js";
 
 var hasGameRoomPlayersTimeouts = [];
 export class LobbyStatusChecker {
-    constructor() {
+    constructor(isHost) {
+        localStorage.removeItem("gameRoom");
         this.updateGameRoomTimeout = [];
         this.arePlayersReadyTimeouts = [];
         this.httpExec = new XMLHttpRequest();
+        this.isHost = isHost;
         this.hasRoomPlayers = false; 
         this.arePlayersReady = false;
         this.isFirstPlayerReady = false;
@@ -33,7 +35,7 @@ export class LobbyStatusChecker {
                 let updater = new GameBoardUpdater(isHost);
                 let json = localStorage.getItem("enemyMap");
                 if (json) {
-                    if (isHost) {
+                    if (this.isHost) {
                         this.isFirstPlayerReady = true;
                         if (this.gameRoom.arePlayersReady) {
                             this.isSecondPlayerReady = true;
