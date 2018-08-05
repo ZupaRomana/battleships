@@ -59,19 +59,12 @@ public class GameBoardUpdater implements HttpHandler {
         requestUri = uri.toString().contains("isInit") ? "gameBoardUpdater": requestUri;
         switch (requestUri) {
             case "gameBoardUpdater":
-                if (lastPostSessionId != null) {
-                    if (uri.toString().contains("isInit=true") && !tacticsMap.containsKey(lastPostSessionId)) {
-                        getGameState(httpExchange);
-                        tacticsMap.put(lastPostSessionId, gameState);
-                        System.out.println(tacticsMap.keySet() + " - Session id: " + sessionId + " - " + tacticsMap.get(lastPostSessionId));
-                        isInit = true;
-                    } else {
-                        getGameState(httpExchange);
-                    }
-                }
+                gameRoom.setLastPostSession(sessionId);
+                gameRoom.addGameState(getGameState(httpExchange));
                 break;
             case "playersTactics":
                 addPlayerMap(sessionId, httpExchange);
+                break;
 
 
         }
@@ -81,20 +74,10 @@ public class GameBoardUpdater implements HttpHandler {
         String requestUri = getRequestUri(httpExchange.getRequestURI());
         switch (requestUri) {
             case "gameBoardUpdater":
-                lastGetSessionId = sessionId;
-                if (isInit) {
-                    for (String key: tacticsMap.keySet()) {
-                        if (key != lastGetSessionId && key != null) {
-                            gameState = tacticsMap.get(key);
-                            sessionsIdReceivedInitMap.add(lastGetSessionId);
-                            System.out.println(lastGetSessionId + " <- SHOULD RECEIVE MAP");
-                        }
-                    }
-                    checkSessionsIfReceivedMap();
+                if (!gameRoom.getLastPostSession().equals(sessionId)) {
+                    gameState = gameRoom.getLatestGameState();
+                    sendGameState(httpExchange, false);
                 }
-                System.out.println(lastPostSessionId + " <- POST GET - >" + lastGetSessionId);
-                System.out.println("MAP->> "+tacticsMap.keySet() + " - " + tacticsMap.get(lastPostSessionId));
-                sendGameState(httpExchange);
                 break;
             case "playersTactics":
                 getOppositePlayerMap(sessionId);
@@ -113,7 +96,7 @@ public class GameBoardUpdater implements HttpHandler {
 
     private void getOppositePlayerMap(String sessionId) {
         Tactics tactics = gameRoom.getTactics();
-        gameState = tactics.getOppisiteTactic(sessionId);
+        gameState = tactics.getOppositeTactic(sessionId);
         tactics.addToPlayersWithEnemyMap(sessionId);
     }
 
@@ -189,5 +172,9 @@ public class GameBoardUpdater implements HttpHandler {
         } catch (IOException err) {
             err.printStackTrace();
         }
+    }
+
+    public void sendGameStateToProperPlayer(String sessionId, HttpExchange httpExchange) {
+
     }
 }
