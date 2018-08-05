@@ -197,7 +197,7 @@ function buildRooms(array, lobbyTimeOut, lobby) {
                     roomDiv.addEventListener("click", () => {
                         if (lobby.statusChecker.arePlayersReady) {
                             clearTimeout(lobbyTimeOut);
-                            startGame();
+                            startGame(lobby.statusChecker.isHost);
                         } else {
                             alert("Players are not ready!");
                         }
