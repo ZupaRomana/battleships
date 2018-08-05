@@ -82,16 +82,12 @@ public class LoginPage implements HttpHandler {
         String sessionId = HttpCookie.parse(cookie).get(0).getValue();
 
         GameRoomsContainer gameRoomsContainer = GameRoomsContainer.getInstance();
-        String hostName = getHostName(httpExchange.getRequestBody());
+        String roomId = getRoomId(httpExchange.getRequestBody());
 
-        System.out.println(sessionId + " <- Session want enter a room| Hostname of room -> " + hostName);
-        for (int i = 0; i < gameRoomsContainer.getAll().size(); i++) {
-            GameRoom gameRoom = gameRoomsContainer.get(i);
-            if (gameRoom.getHostPlayerName().equalsIgnoreCase(hostName) && gameRoom.getClientPlayerName() == null) {
-                gameRoom.setClientPlayerName(AccountContainer.getInstance().get(sessionId));
-                gameRoom.setClientPlayerSessionId(sessionId);
-            }
-        }
+        GameRoom gameRoom = gameRoomsContainer.get(Integer.parseInt(roomId));
+        System.out.println(sessionId + " <- Session want enter a room| Room ID -> " + roomId);
+        gameRoom.setClientPlayerName(AccountContainer.getInstance().get(sessionId));
+        gameRoom.setClientPlayerSessionId(sessionId);
     }
 
     private void createNewGameRoom()
@@ -198,14 +194,14 @@ public class LoginPage implements HttpHandler {
         return parseFormData(formData);
     }
 
-    private String getHostName(InputStream is) {
+    private String getRoomId(InputStream is) {
         List<Byte> byteList = getBytesList(is);
         byte[] bytes = new byte[byteList.size()];
         for (int i = 0; i < bytes.length; i++) {
             bytes[i] = byteList.get(i);
         }
-        String hostName = new String(bytes);
-        return hostName;
+        String roomId = new String(bytes);
+        return roomId;
 }
     private List<Byte> getBytesList(InputStream is) {
         List<Byte> byteList = new ArrayList<>();
