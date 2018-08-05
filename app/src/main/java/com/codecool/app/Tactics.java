@@ -26,7 +26,7 @@ public class Tactics {
         return tacticsMap.containsKey(sessionId);
     }
 
-    public String getOppisiteTactic(String sessionId) {
+    public String getOppositeTactic(String sessionId) {
         for (String key: tacticsMap.keySet()) {
             if (!key.equals(sessionId)) {
                 return this.tacticsMap.get(key);
