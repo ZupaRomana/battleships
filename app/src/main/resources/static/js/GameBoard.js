@@ -104,7 +104,7 @@ export class GameBoard {
                 if (square.isHit | square.isMiss) {
                     htmlSquare.removeEventListener("click", onClick);
                 }
-                gameBoardUpdater.postJSONToServer(gameBoardUpdater.parseGameBoardContainerToJSON(container));
+                gameBoardUpdater.postJSONToServer(JSON.stringify(container));
                 gameBoardUpdater.isBeginOfGame = false;
             }
         };
