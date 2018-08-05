@@ -28,21 +28,9 @@ export class GameBoardsContainer {
         }
     }
 
-    scaleGameBoardToBrowserZoomLevel() {
-        let updateMap = () => {
-            try { 
-                if (!this.gameBoardUpdater.isBeginOfGame) {
-                    this.gameBoardUpdater.getJSONFromServerAndUpdateMap(this.gameBoards);
-                } else {
-                    this.gameBoardUpdater.isBeginOfGame = true;
-                }
-            } catch(err) {
-                console.log(err.message);
-            }
-        };
-
+    scaleGameBoardToBrowserZoomLevelAndUpdateMap() {
         window.setInterval(() => {
-            updateMap()
+            this.gameBoardUpdater.getJSONFromServerAndUpdateMap(this.gameBoards);
             let browserZoomLevel = Math.round(window.devicePixelRatio * 100);
             let multipler = browserZoomLevel / 100;
             if (browserZoomLevel > 100) {
@@ -53,13 +41,13 @@ export class GameBoardsContainer {
                 this.container.style.height = `${100}%`;
             }
             GameBoard.setSizeOfGameBoards(this.gameBoards);
-        }, 3000);
+        }, 1000);
     }
 }
 
 export function startGame(isHost) {    
         let gameBoardsContainer = new GameBoardsContainer(isHost);
         document.getElementById("main-container").appendChild(gameBoardsContainer.container);
-        gameBoardsContainer.scaleGameBoardToBrowserZoomLevel();
+        gameBoardsContainer.scaleGameBoardToBrowserZoomLevelAndUpdateMap();
         document.getElementById("lobby").remove();
     }
