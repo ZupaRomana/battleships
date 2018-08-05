@@ -6,7 +6,11 @@ export class GameBoard {
     constructor(isPlayer = true) {
         this.gameBoard = [];
         this.isPlayer = isPlayer;
+        this.isPlayerMove = true;
         this.loadSquares();
+        this.getBoard = function () {
+            return this.gameBoard;
+        };
     }
 
     loadSquares() {
@@ -20,19 +24,32 @@ export class GameBoard {
         }
     }
 
-    getGameBoard() {
+    getGameBoard(gameBoardUpdater, container) {
         if (this.isPlayer) {
-            return this.getPlayerGameBoard();
+            return this.getPlayerGameBoard(gameBoardUpdater);
         } else {
-            return this.getEnemyGameBoard();
+            return this.getEnemyGameBoard(gameBoardUpdater, container);
+        }
+    }
+
+    getTacticGameBoard(jsonArray) {
+        if (jsonArray) {
+            this.gameBoard = this.readSquaresFromArray(jsonArray);
+            return this.getGameBoardDiv(true);
+        } else {
+            return this.getGameBoardDiv();
         }
     }
 
 
-    getGameBoardDiv() {
+    getGameBoardDiv(isTactic = false) {
         let gameBoard = document.createElement("div");
         gameBoard.setAttribute("class", "game-board");
         for (let square of this.gameBoard) {
+            
+            if (!isTactic) {
+                square.loadDiv();
+            }
             let htmlSquare = square.getHTMLSquare();
             gameBoard.appendChild(htmlSquare);
         }
@@ -40,6 +57,8 @@ export class GameBoard {
     }
 
     getPlayerGameBoard() {
+        let json = JSON.parse(localStorage.getItem("map"));
+        this.gameBoard = this.readSquaresFromArray(json.gameBoard);
         let gameBoard = this.getGameBoardDiv();
     
         for (let i = 0; i < this.gameBoard.length; i++) {
@@ -52,38 +71,69 @@ export class GameBoard {
         return gameBoard;
     }
 
-    getEnemyGameBoard() {
+    getEnemyGameBoard(gameBoardUpdater, container) {
+        let enemyMap = localStorage.getItem("enemyMap");
+        let json = JSON.parse(enemyMap);
+        this.gameBoard = this.readSquaresFromArray(json.gameBoard);
         let gameBoard = this.getGameBoardDiv();
         
         for (let i = 0; i < this.gameBoard.length; i++) {
             let square = this.gameBoard[i];
-            if (i % 2 === 0) {
-                square.isShip = true;
-            } 
-            this.setEnemyGameBoardColorAddEvent(square);
+            this.setEnemyGameBoardColorAddEvent(square, gameBoardUpdater, container);
         }
+
         gameBoard.style.border = "2px solid black";
         return gameBoard;
     }
 
-    setEnemyGameBoardColorAddEvent(square) {
-        let htmlSquare = square.div;
+    setEnemyGameBoardColorAddEvent(square, gameBoardUpdater, container) {
+        let htmlSquare = square.getHTMLSquare();
         htmlSquare.style.backgroundColor = "cyan";
         let onClick = (e) => {
-            console.log(`Width: ${htmlSquare.offsetWidth} Height: ${htmlSquare.offsetHeight}`);
-            console.log(`xPos: ${square.xPos} yPos: ${square.yPos}`);
-
-            if (square.isShip) {
-                this.changeSquareToHit(square);
-                this.changeCornerSquaresToMiss(square);
-            } else {
-                this.changeSquareToMiss(square);
-            }
-            if (square.isHit | square.isMiss) {
-                htmlSquare.removeEventListener("click", onClick);
+            if (this.isPlayerMove) {
+                if (square.isShip) {
+                    this.changeSquareToHit(square);
+                    this.changeCornerSquaresToMiss(square);
+                } else {
+                    this.changeSquareToMiss(square);
+                    this.isPlayerMove = false;
+                    gameBoardUpdater.isTurnChange = true;
+                }
+                if (square.isHit | square.isMiss) {
+                    htmlSquare.removeEventListener("click", onClick);
+                }
+                gameBoardUpdater.postJSONToServer(JSON.stringify(container));
             }
         };
         htmlSquare.addEventListener("click", onClick);
+
+        htmlSquare.addEventListener("mouseover", () => {
+            if (square.isHit | square.isMiss) {
+                htmlSquare.removeEventListener("click", onClick);
+            }
+        });
+    }
+
+    getSquare(xPos, yPos) {
+
+        for (let square of this.gameBoard) {
+            if (square.xPos == xPos && square.yPos == yPos) {
+                return square;
+            }
+        }
+    }
+
+    readSquaresFromArray(array) { 
+        let gameBoard = []; 
+        for (let i = 0; i < array.length; i++) { 
+            let square = new Square(); 
+            square.xPos = array[i].xPos; 
+            square.yPos = array[i].yPos; 
+            square.isShip = array[i].isShip; 
+            square.loadDiv(); 
+            gameBoard.push(square); 
+        } 
+        return gameBoard; 
     }
 
     changeCornerSquaresToMiss(square) {
@@ -129,6 +179,4 @@ export class GameBoard {
             }
         }
     }
-
-
 }
