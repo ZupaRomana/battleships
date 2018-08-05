@@ -29,7 +29,7 @@ export class LobbyStatusChecker {
     
     checkIfPlayersAreReady() {
         if (this.gameRoom) {
-            if (this.gameRoom.isHostReady & this.gameRoom.isPlayerReady) {
+            if (this.gameRoom.isHostPostMap & this.gameRoom.isPlayerPostMap) {
                 let updater = new GameBoardUpdater(isHost);
                 let json = localStorage.getItem("enemyMap");
                 if (json) {
