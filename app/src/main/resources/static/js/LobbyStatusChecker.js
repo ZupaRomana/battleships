@@ -1,5 +1,4 @@
 import { GameBoardUpdater } from "./GameBoardUpdater.js";
-import { isHost } from "./Lobby.js";
 
 "use strict";
 
@@ -32,7 +31,7 @@ export class LobbyStatusChecker {
     checkIfPlayersAreReady() {
         if (this.gameRoom) {
             if (this.gameRoom.isHostPostMap & this.gameRoom.isPlayerPostMap) {
-                let updater = new GameBoardUpdater(isHost);
+                let updater = new GameBoardUpdater(this.isHost);
                 let json = localStorage.getItem("enemyMap");
                 if (json) {
                     if (this.isHost) {
@@ -48,7 +47,7 @@ export class LobbyStatusChecker {
                             this.arePlayersReady = this.gameRoom.arePlayersReady;
                         }
                     }
-                    console.log("Players are ready!" + " Time out: " + playersAreReadyTimeout + " Is host: " + isHost);
+                    console.log("Players are ready!" + " Time out: " + playersAreReadyTimeout + " Is host: " + this.isHost);
                     clearTimeout(playersAreReadyTimeout);
                 } else {
                     updater.getEnemyMapFromServer();    
