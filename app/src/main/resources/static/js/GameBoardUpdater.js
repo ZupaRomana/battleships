@@ -18,14 +18,14 @@ export class GameBoardUpdater {
             let gameRoom = JSON.parse(localStorage.getItem("gameRoom"));
             if (gameRoom) {
                 if (this.isHost) {
-                    if (gameRoom.isHostSendMap) {
-                        while (this.postPlayerMapTimeouts > 0) {
+                    if (gameRoom.isHostPostMap) {
+                        while (this.postPlayerMapTimeouts.length > 0) {
                             clearTimeout(this.postPlayerMapTimeouts.pop());
                         }
                     }
                 } else {
-                    if (gameRoom.isPlayerSendMap) {
-                        while (this.postPlayerMapTimeouts > 0) {
+                    if (gameRoom.isPlayerPostMap) {
+                        while (this.postPlayerMapTimeouts.length > 0) {
                             clearTimeout(this.postPlayerMapTimeouts.pop());
                         }
                     }
