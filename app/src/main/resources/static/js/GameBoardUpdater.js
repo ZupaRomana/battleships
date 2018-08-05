@@ -73,64 +73,64 @@ export class GameBoardUpdater {
     updatePlayerMap(json, actualGameBoards) {
 
         let receivedGameBoards = JSON.parse(json).gameBoards;
-        let actualGameBoard = this.getActualPlayerGameBoard(actualGameBoards);
-        let actualEnemyBoard = this.getActualEnemyBoard(actualGameBoards)
-        let receivedGameBoard = this.getReceivedPlayerGameBoard(receivedGameBoards);
+        let actualGameBoard = getActualPlayerGameBoard(actualGameBoards);
+        let actualEnemyBoard = getActualEnemyBoard(actualGameBoards)
+        let receivedGameBoard = getReceivedPlayerGameBoard(receivedGameBoards);
 
-        this.changeTurn(actualEnemyBoard, receivedGameBoard);
+        changeTurn(actualEnemyBoard, receivedGameBoard);
 
         for (let i = 0; i < actualGameBoard.gameBoard.length; i++) {
             let actualSquare = actualGameBoard.gameBoard[i];
             let receivedSquare = receivedGameBoard.gameBoard[i];
             
             if (receivedSquare.xPos === actualSquare.xPos & receivedSquare.yPos === actualSquare.yPos) {
-                this.checkAndChangeSquareState(receivedSquare, actualSquare);
+                checkAndChangeSquareState(receivedSquare, actualSquare);
                 actualSquare.updateDivColor();
             }
         }
     }
+}
 
-    changeTurn(actualGameBoard, receivedGameBoard) {
-        if (!receivedGameBoard.isPlayerMove) {
-            actualGameBoard.isPlayerMove = true;
-        } else {
-            actualGameBoard.isPlayerMove = false;
+function changeTurn(actualGameBoard, receivedGameBoard) {
+    if (!receivedGameBoard.isPlayerMove) {
+        actualGameBoard.isPlayerMove = true;
+    } else {
+        actualGameBoard.isPlayerMove = false;
+    }
+}
+
+function getActualPlayerGameBoard(actualGameBoards) {
+    for (let gameBoard of actualGameBoards) {
+        if (gameBoard.isPlayer) {
+            return gameBoard;
         }
     }
-    
-    getActualPlayerGameBoard(actualGameBoards) {
-        for (let gameBoard of actualGameBoards) {
-            if (gameBoard.isPlayer) {
-                return gameBoard;
-            }
+}
+
+function getActualEnemyBoard(actualGameBoards) {
+    for (let gameBoard of actualGameBoards) {
+        if (!gameBoard.isPlayer) {
+            return gameBoard;
         }
     }
+}
 
-    getActualEnemyBoard(actualGameBoards) {
-        for (let gameBoard of actualGameBoards) {
-            if (!gameBoard.isPlayer) {
-                return gameBoard;
-            }
+function getReceivedPlayerGameBoard(receivedGameBoards) {
+    for (let gameBoard of receivedGameBoards) {
+        if (!gameBoard.isPlayer) {
+            return gameBoard;
         }
     }
+}
 
-    getReceivedPlayerGameBoard(receivedGameBoards) {
-        for (let gameBoard of receivedGameBoards) {
-            if (!gameBoard.isPlayer) {
-                return gameBoard;
-            }
-        }
+function checkAndChangeSquareState(receivedSquare, actualSquare) {
+    if (receivedSquare.isHit !== actualSquare.isHit) {
+        actualSquare.isHit = receivedSquare.isHit;
+    } 
+    if (receivedSquare.isMiss !== actualSquare.isMiss) {
+        actualSquare.isMiss = receivedSquare.isMiss;
     }
-
-    checkAndChangeSquareState(receivedSquare, actualSquare) {
-        if (receivedSquare.isHit !== actualSquare.isHit) {
-            actualSquare.isHit = receivedSquare.isHit;
-        } 
-        if (receivedSquare.isMiss !== actualSquare.isMiss) {
-            actualSquare.isMiss = receivedSquare.isMiss;
-        }
-        if (receivedSquare.isShip !== actualSquare.isShip) {
-            actualSquare.isShip = receivedSquare.isShip;
-        }
+    if (receivedSquare.isShip !== actualSquare.isShip) {
+        actualSquare.isShip = receivedSquare.isShip;
     }
 }
