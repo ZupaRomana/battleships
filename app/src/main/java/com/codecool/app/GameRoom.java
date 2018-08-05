@@ -6,11 +6,11 @@ public class GameRoom {
 
     private String hostingPlayerSessionId;
     private String hostPlayerName;
-    private boolean isHostReady;
+    private boolean isHostPostMap;
 
     private String clientPlayerSessionId;
     private String clientPlayerName;
-    private boolean isPlayerReady;
+    private boolean isPlayerPostMap;
 
     private Tactics tactics;
 
@@ -20,10 +20,10 @@ public class GameRoom {
     public GameRoom(String hostingPlayerSessionId, String hostPlayerName, Tactics tactics) {
         this.hostingPlayerSessionId = hostingPlayerSessionId;
         this.hostPlayerName = hostPlayerName;
-        isHostReady = false;
+        isHostPostMap = false;
         this.clientPlayerSessionId = null;
         this.clientPlayerName = null;
-        isPlayerReady = false;
+        isPlayerPostMap = false;
         this.tactics = tactics;
         this.id = actualId++;
     }
@@ -40,12 +40,8 @@ public class GameRoom {
         return hostPlayerName;
     }
 
-    public boolean getIsHostReady() {
-        return isHostReady;
-    }
-
-    public void setHostReady(boolean hostReady) {
-        this.isHostReady = hostReady;
+    public boolean getIsHostPostMap() {
+        return isHostPostMap;
     }
 
     public void setHostPlayerName(String hostPlayerName) {
@@ -68,12 +64,8 @@ public class GameRoom {
         this.clientPlayerSessionId = clientPlayerSessionId;
     }
 
-    public boolean getIsPlayerReady() {
-        return isPlayerReady;
-    }
-
-    public void setPlayerReady(boolean playerReady) {
-        this.isPlayerReady = playerReady;
+    public boolean getIsPlayerPostMap() {
+        return isPlayerPostMap;
     }
 
     public static int getActualId() {
@@ -90,10 +82,10 @@ public class GameRoom {
 
     public void updatePlayerStatus() {
         if (tactics.contains(hostingPlayerSessionId)) {
-            isHostReady = true;
+            isHostPostMap = true;
         }
         if (clientPlayerSessionId != null && tactics.contains(clientPlayerSessionId)) {
-            isPlayerReady = true;
+            isPlayerPostMap = true;
         }
     }
 
