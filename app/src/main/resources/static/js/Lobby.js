@@ -1,6 +1,6 @@
 "use strict";
 
-import { startGameBoard } from "./GameBoardsContainer.js";
+import { startGame } from "./GameBoardsContainer.js";
 import { LobbyStatusChecker } from "./LobbyStatusChecker.js";
 import { GameBoardUpdater } from "./GameBoardUpdater.js";
 import { tactics } from "./tactics.js";
@@ -21,20 +21,16 @@ export class Lobby {
     launch() {
         this.setupLobby();
         constructBody(this);
-        fillRooms(this.gameBoardUpdater, this);
+        fillRooms(this);
     }
 
     setupLobby() {
         localStorage.removeItem("enemyMap");
-        localStorage.removeItem("gameRoom");
-        this.statusChecker = null;//new LobbyStatusChecker();
-        this.gameBoardUpdater = new GameBoardUpdater();
+        this.statusChecker = null;
     }
 }
 
 function constructBody(lobbyStatus) {
-
-    
 
     const mainDiv = document.querySelector('#main-container');
 
@@ -73,11 +69,7 @@ function constructBody(lobbyStatus) {
     createNewRoomButton.innerHTML = "Create new room";
     createNewRoomButton.addEventListener('click', () => {
         if (!isEnteredToRoom) {
-            isEnteredToRoom = true;
-            lobbyStatus.statusChecker = new LobbyStatusChecker(true);
-            sendPostCreateNewRoom(lobbyStatus.statusChecker);
-            let updater = new GameBoardUpdater(true);
-            updater.postPlayerMapToServer();
+            createNewRoom(lobbyStatus);
         } else {
             alert("You have already create a room or you have already join a room!");
         }
@@ -88,6 +80,14 @@ function constructBody(lobbyStatus) {
     lobbyRoomsContainer.setAttribute('id', 'lobby-rooms-container');
     lobby.appendChild(lobbyRoomsContainer);
 
+}
+
+function createNewRoom(lobby) {
+    isEnteredToRoom = true;
+    lobby.statusChecker = new LobbyStatusChecker(true);
+    sendPostCreateNewRoom(lobby.statusChecker);
+    let updater = new GameBoardUpdater(true);
+    updater.postPlayerMapToServer();
 }
 
 function sendPostCreateNewRoom(statusChecker) {
@@ -104,25 +104,13 @@ function sendPostCreateNewRoom(statusChecker) {
     } else { window.alert("Set your tactics"); }
 }
 
-function redirectToGameRoom(gameBoardUpdater, isSelect) {
-    
-    if (isSelect) {
-        var redirectInternal = setInterval(() => {
-            gameBoardUpdater.postJSONToServer(localStorage.getItem("map"), true);
-        }, 1000);
-    }
-
-    startGameBoard(gameBoardUpdater, redirectInternal);
-}
-
-
 function enterARoom(roomId) {
     const request = new XMLHttpRequest();
     request.open("POST", "/index/enterARoom", true);
     request.send(roomId);
 }
 
-function fillRooms(gameBoardUpdater, lobby) {
+function fillRooms(lobby) {
 
      const request = new XMLHttpRequest();
 
@@ -151,15 +139,15 @@ function fillRooms(gameBoardUpdater, lobby) {
                 }
             }
 
-            buildRooms(array, gameBoardUpdater, lobbyTimeOut, lobby);
+            buildRooms(array, lobbyTimeOut, lobby);
         };
     };
     request.open("GET", "/index/count", true);
     request.send();
-    var lobbyTimeOut = setTimeout(() => { fillRooms(gameBoardUpdater, lobby); }, 1000);
+    var lobbyTimeOut = setTimeout(() => { fillRooms(lobby); }, 1000);
 }
 
-function buildRooms(array, gameBoardUpdater, lobbyTimeOut, lobby) {
+function buildRooms(array, lobbyTimeOut, lobby) {
    
     const roomsContainer = document.querySelector("#lobby-rooms-container");
     roomsContainer.innerHTML = "";
@@ -179,7 +167,6 @@ function buildRooms(array, gameBoardUpdater, lobbyTimeOut, lobby) {
 
                 let p1Div = document.createElement("div");
                 p1Div.innerHTML = "P1: " + room[INDEX_HOST_NAME];
-                hostname = room[INDEX_HOST_NAME];
                 roomDiv.appendChild(p1Div);
 
                 let p2Div = document.createElement("div");
@@ -210,7 +197,7 @@ function buildRooms(array, gameBoardUpdater, lobbyTimeOut, lobby) {
                     roomDiv.addEventListener("click", () => {
                         if (lobby.statusChecker.arePlayersReady) {
                             clearTimeout(lobbyTimeOut);
-                            startGameBoard(gameBoardUpdater);
+                            startGame();
                         } else {
                             alert("Players are not ready!");
                         }
