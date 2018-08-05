@@ -46,7 +46,7 @@ export class GameBoardUpdater {
             if (this.httpExec.status == 200 & this.httpExec.readyState == 4) {
                 let json = this.httpExec.response;
                 if (json) {
-                    localStorage.setItem("enemyMap", this.httpExec.response);
+                    localStorage.setItem("enemyMap", json);
                 } else {
                     console.log("Cannot load resources! " + json + " <- JSON")
                 }
