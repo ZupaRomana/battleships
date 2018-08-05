@@ -19,10 +19,16 @@ export class Lobby {
     constructor(){}
 
     launch() {
-        this.statusChecker = new LobbyStatusChecker();
-        this.gameBoardUpdater = new GameBoardUpdater();
+        this.setupLobby();
         constructBody(this.gameBoardUpdater, this.statusChecker);
         fillRooms(this.gameBoardUpdater, this.statusChecker);
+    }
+
+    setupLobby() {
+        localStorage.removeItem("enemyMap");
+        localStorage.removeItem("gameRoom");
+        this.statusChecker = new LobbyStatusChecker();
+        this.gameBoardUpdater = new GameBoardUpdater();
     }
 }
 
@@ -97,10 +103,7 @@ function redirectToGameRoom(gameBoardUpdater, isSelect) {
     
     if (isSelect) {
         var redirectInternal = setInterval(() => {
-            console.log("In select");
-
             gameBoardUpdater.postJSONToServer(localStorage.getItem("map"), true);
-            isPlayerSendMapToServer = true;
         }, 1000);
     }
 
@@ -173,7 +176,7 @@ function buildRooms(array, gameBoardUpdater, lobbyTimeOut, statusChecker) {
                 roomDiv.appendChild(p2Div);
                 roomDiv.setAttribute("disabled", statusChecker.arePlayersReady ? "false": "true");
 
-                if (room[INDEX_CLIENT_NAME] == "null") {
+                if (room[INDEX_CLIENT_NAME] == "null" && !isHost) {
                     let joinButton = document.createElement("button");
                     joinButton.setAttribute("id", "join-button");
                     joinButton.textContent = "JOIN";
