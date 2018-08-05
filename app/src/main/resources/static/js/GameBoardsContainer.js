@@ -4,7 +4,8 @@ import { GameBoard } from "./GameBoard.js";
 import { GameBoardUpdater } from "./GameBoardUpdater.js";
 
 export class GameBoardsContainer {
-    constructor() {
+    constructor(isHost) {
+        this.isHost = isHost;
         this.gameBoardUpdater = new GameBoardUpdater();
         this.gameBoards = [new GameBoard(false), new GameBoard()];
         this.loadAndFillContainer();
@@ -19,6 +20,11 @@ export class GameBoardsContainer {
     fillContaier() {
         for (let gameBoard of this.gameBoards) {
             this.container.appendChild(gameBoard.getGameBoard(this.gameBoardUpdater, this));
+            if (this.isHost & !gameBoard.isPlayer) {
+                gameBoard.isPlayerMove = true;
+            } else {
+                gameBoard.isPlayerMove = false;
+            }
         }
     }
 
@@ -51,8 +57,8 @@ export class GameBoardsContainer {
     }
 }
 
-export function startGame() {    
-        let gameBoardsContainer = new GameBoardsContainer();
+export function startGame(isHost) {    
+        let gameBoardsContainer = new GameBoardsContainer(isHost);
         document.getElementById("main-container").appendChild(gameBoardsContainer.container);
         gameBoardsContainer.scaleGameBoardToBrowserZoomLevel();
         document.getElementById("lobby").remove();
