@@ -15,24 +15,26 @@ const INDEX_CLIENT_SESSION = 5;
 var hostname;
 var isPlayerSendMapToServer = false;
 export var isHost;
+var isEnteredToRoom;
+
 export class Lobby {
     constructor(){}
 
     launch() {
         this.setupLobby();
-        constructBody(this.gameBoardUpdater, this.statusChecker);
-        fillRooms(this.gameBoardUpdater, this.statusChecker);
+        constructBody(this);
+        fillRooms(this.gameBoardUpdater, this);
     }
 
     setupLobby() {
         localStorage.removeItem("enemyMap");
         localStorage.removeItem("gameRoom");
-        this.statusChecker = new LobbyStatusChecker();
+        this.statusChecker = null;//new LobbyStatusChecker();
         this.gameBoardUpdater = new GameBoardUpdater();
     }
 }
 
-function constructBody(gameBoardUpdater, statusChecker) {
+function constructBody(lobbyStatus) {
 
     
 
@@ -72,10 +74,16 @@ function constructBody(gameBoardUpdater, statusChecker) {
     createNewRoomButton.setAttribute('id', 'create-new-room');
     createNewRoomButton.innerHTML = "Create new room";
     createNewRoomButton.addEventListener('click', () => {
-        sendPostCreateNewRoom(statusChecker);
-        isHost = true;
-        let updater = new GameBoardUpdater(isHost);
-        updater.postPlayerMapToServer();
+        if (!isEnteredToRoom) {
+            isEnteredToRoom = true;
+            lobbyStatus.statusChecker = new LobbyStatusChecker(true);
+            sendPostCreateNewRoom(lobbyStatus.statusChecker);
+            isHost = true;
+            let updater = new GameBoardUpdater(isHost);
+            updater.postPlayerMapToServer();
+        } else {
+            alert("You have already create a room or you have already join a room!");
+        }
     })
     lobby.appendChild(createNewRoomButton);
 
@@ -111,13 +119,13 @@ function redirectToGameRoom(gameBoardUpdater, isSelect) {
 }
 
 
-function enterARoom() {
+function enterARoom(roomId) {
     const request = new XMLHttpRequest();
     request.open("POST", "/index/enterARoom", true);
-    request.send(hostname);
+    request.send(roomId);
 }
 
-function fillRooms(gameBoardUpdater, statusChecker) {
+function fillRooms(gameBoardUpdater, lobby) {
 
      const request = new XMLHttpRequest();
 
@@ -129,28 +137,33 @@ function fillRooms(gameBoardUpdater, statusChecker) {
 
             let lobbyHeaderPlayersCount = document.querySelector('#counter');
             lobbyHeaderPlayersCount.innerHTML = `Players online: ${onlinePlayers}`;
-            if (statusChecker.hasRoomPlayers) {
-                let gameRoom = statusChecker.gameRoom;;
-                let playerName = gameRoom.playerName; 
 
-                let isPlayerReady = (isReady) => {
-                    return isReady ? "Ready!": "Not ready!"
-                };
-                lobbyHeaderPlayersCount.innerHTML = `Players online: ${onlinePlayers}` +
-                 `<br>${gameRoom.hostName}: ${isPlayerReady(statusChecker.isFirstPlayerReady)}
-                 <br>${playerName ? playerName: "Waiting for player!"}: ${isPlayerReady(statusChecker.isSecondPlayerReady)}`;
-                 lobbyHeaderPlayersCount.style.fontSize = "20px";
+            if (lobby.statusChecker) {
+                console.log(lobby.statusChecker + "inIf");
+                if (lobby.statusChecker.hasRoomPlayers) {
+                    let statusChecker = lobby.statusChecker;
+                    let gameRoom = statusChecker.gameRoom;
+                    let playerName = gameRoom.playerName; 
+
+                    let isPlayerReady = (isReady) => {
+                        return isReady ? "Ready!": "Not ready!"
+                    };
+                    lobbyHeaderPlayersCount.innerHTML = `Players online: ${onlinePlayers}` +
+                    `<br>${gameRoom.hostName}: ${isPlayerReady(statusChecker.isFirstPlayerReady)}
+                    <br>${playerName ? playerName: "Waiting for player!"}: ${isPlayerReady(statusChecker.isSecondPlayerReady)}`;
+                    lobbyHeaderPlayersCount.style.fontSize = "20px";
+                }
             }
 
-            buildRooms(array, gameBoardUpdater, lobbyTimeOut, statusChecker);
+            buildRooms(array, gameBoardUpdater, lobbyTimeOut, lobby);
         };
     };
     request.open("GET", "/index/count", true);
     request.send();
-    var lobbyTimeOut = setTimeout(() => { fillRooms(gameBoardUpdater, statusChecker); }, 1000);
+    var lobbyTimeOut = setTimeout(() => { fillRooms(gameBoardUpdater, lobby); }, 1000);
 }
 
-function buildRooms(array, gameBoardUpdater, lobbyTimeOut, statusChecker) {
+function buildRooms(array, gameBoardUpdater, lobbyTimeOut, lobby) {
    
     const roomsContainer = document.querySelector("#lobby-rooms-container");
     roomsContainer.innerHTML = "";
@@ -160,9 +173,11 @@ function buildRooms(array, gameBoardUpdater, lobbyTimeOut, statusChecker) {
 
         for (let i = 0; i < rooms.length; i++) {
             if (rooms[i].length > 5) {
+            
                 let room = rooms[i].split("#");
 
                 let roomDiv = document.createElement("div");
+                let roomId = room[INDEX_ROOM_ID];
                 roomDiv.setAttribute("room-id", room[INDEX_ROOM_ID]);
                 roomDiv.setAttribute("class", "room");
 
@@ -174,23 +189,26 @@ function buildRooms(array, gameBoardUpdater, lobbyTimeOut, statusChecker) {
                 let p2Div = document.createElement("div");
                 p2Div.innerHTML = room[INDEX_CLIENT_NAME] == "null" ? "FREE" : "P2: " + room[INDEX_CLIENT_NAME];
                 roomDiv.appendChild(p2Div);
-                roomDiv.setAttribute("disabled", statusChecker.arePlayersReady ? "false": "true");
+                if (lobby.statusChecker) {
+                    roomDiv.setAttribute("disabled", lobby.statusChecker.arePlayersReady ? "false": "true");
+                }
 
-                if (room[INDEX_CLIENT_NAME] == "null" && !isHost) {
+                if (room[INDEX_CLIENT_NAME] == "null" && !lobby.statusChecker) {
                     let joinButton = document.createElement("button");
                     joinButton.setAttribute("id", "join-button");
                     joinButton.textContent = "JOIN";
                     joinButton.addEventListener('click', () => {
-                        enterARoom()
-                        statusChecker.run();
-                        isHost = false;
-                        let updater = new GameBoardUpdater(isHost);
-                        updater.postPlayerMapToServer();
-                        //updater.postPlayerMapToServer(localStorage.getItem("map"));
-                        /*gameBoardUpdater.getJSONFromServerInitial();
-                        gameBoardUpdater.postJSONToServer(localStorage.getItem("map"), true);
-                        isPlayerSendMapToServer = true;*/
-
+                        if (!isEnteredToRoom) {
+                            isEnteredToRoom = true;
+                            enterARoom(roomId);
+                            lobby.statusChecker = new LobbyStatusChecker(false);
+                            lobby.statusChecker.run();
+                            isHost = false;
+                            let updater = new GameBoardUpdater(isHost);
+                            updater.postPlayerMapToServer();
+                        } else {
+                            alert("You have already join a room!");
+                        }
                     });
                     roomDiv.appendChild(joinButton);
                 } else {
