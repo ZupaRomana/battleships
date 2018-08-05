@@ -5,11 +5,6 @@ export class GameBoardUpdater {
         this.postPlayerMapTimeouts = [];
         this.isHost = isHost;
         this.httpExec = new XMLHttpRequest();
-        this.isBeginOfGame = true;
-    }
-
-    parseGameBoardContainerToJSON(gameBoardContainer) {
-        return JSON.stringify(gameBoardContainer);
     }
 
     postPlayerMapToServer() {
@@ -56,42 +51,22 @@ export class GameBoardUpdater {
         this.httpExec.send(null);
     }
 
-    postJSONToServer(json, isBeginOfGame = false) {
-        if (!isBeginOfGame) {
-            this.httpExec.open("POST", "/gameBoardUpdater", true);
-            this.httpExec.setRequestHeader("Content-Type", "application/json");
-            this.httpExec.send(json);
-        } else {
-            this.httpExec.open("POST", "/gameBoardUpdater?isInit=true", true);
-            this.httpExec.setRequestHeader("Content-Type", "application/json");
-            this.httpExec.send(json);
-        }
+    postJSONToServer(json) {
+        this.httpExec.open("POST", "/gameBoardUpdater", true);
+        this.httpExec.setRequestHeader("Content-Type", "application/json");
+        this.httpExec.send(json);
     }
 
-    getJSONFromServerInitial() {
-        let json;
+    getJSONFromServerAndUpdateMap(actualGameBoards) {
         this.httpExec.onreadystatechange = () => {
             if (this.httpExec.readyState == 4 && this.httpExec.status == 200) {
-                json = this.httpExec.responseText;
+                let json = this.httpExec.responseText;
                 if (json) {
-                    localStorage.setItem("enemyMap", json);
-                } else {
-                    console.log("cannot load resources! " + json + " <- JSON");
+                    this.updatePlayerMap(json, actualGameBoards);
                 }
             }
         };
         this.httpExec.open("GET", "/gameBoardUpdater", true);
-        this.httpExec.send(null);
-    }
-
-    getJSONFromServerAndUpdateMap(actualGameBoards) {
-        this.isBeginOfGame = false;
-        this.httpExec.onreadystatechange = () => {
-            if (this.httpExec.readyState == 4 && this.httpExec.status == 200) {
-                this.updatePlayerMap(this.httpExec.responseText, actualGameBoards);
-            }
-        };
-        this.httpExec.open("GET", "/gameBoardUpdater", false);
         this.httpExec.send(null);
     }
 
@@ -102,7 +77,7 @@ export class GameBoardUpdater {
         let actualEnemyBoard = this.getActualEnemyBoard(actualGameBoards)
         let receivedGameBoard = this.getReceivedPlayerGameBoard(receivedGameBoards);
 
-        this.changeTurn(actualEnemyBoard, receivedGameBoard, JSON.parse(json).gameBoardUpdater);
+        this.changeTurn(actualEnemyBoard, receivedGameBoard);
 
         for (let i = 0; i < actualGameBoard.gameBoard.length; i++) {
             let actualSquare = actualGameBoard.gameBoard[i];
@@ -115,7 +90,7 @@ export class GameBoardUpdater {
         }
     }
 
-    changeTurn(actualGameBoard, receivedGameBoard, receivedUpdater) {
+    changeTurn(actualGameBoard, receivedGameBoard) {
         if (!receivedGameBoard.isPlayerMove) {
             actualGameBoard.isPlayerMove = true;
         } else {
